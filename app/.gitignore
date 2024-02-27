@@ -1,0 +1,7 @@
+.venv
+.env
+*.db
+www/node_modules
+www/.next
+media/attachments/
+dev/
