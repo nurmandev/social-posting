@@ -63,7 +63,7 @@ class IsCustomerAndAdmin(IsCustomer):
     def has_permission(self, request, view):
         try:
             user = UserSerializer(request.user).data
-            if user['user_info']['role']['name'] == "admin" :
+            if user['user_info']['role']['role_id'] == "admin" :
                 return True
             else:
                 return False
@@ -78,7 +78,7 @@ class IsCustomerAndMember(IsCustomer):
     def has_permission(self, request, view):
         try:
             user = UserSerializer(request.user).data
-            if user['user_info']['role']['name'] == "member" :
+            if user['user_info']['role']['role_id'] == "member" :
                 return True
             else:
                 return False

@@ -24,16 +24,10 @@ class ProfileView(APIView):
     def get(self, request):
         
         try:
-            if request.user.permission == "customer":
-            
-                data = UserInfoSerializer(request.user.user_info).data
-                data["email"] = request.user.email
-                return Response(data, 200)
-            
-            if request.user.permission == "super" or request.user.permission == "owner":
-                return Response({
-                    "email": request.user.email,
-                })
+            data = UserInfoSerializer(request.user.user_info).data
+            data["email"] = request.user.email
+            data['permission'] = request.user.permission
+            return Response(data, 200)
 
         except Exception as e:
             print(str(e))

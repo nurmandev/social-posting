@@ -117,9 +117,6 @@ class Mail(models.Model):
     
     subject = models.CharField(max_length=255, blank=True, null=True)
     body = models.TextField(blank=True, null=True)
-    to = models.EmailField(max_length=50, blank=True, null=True)
-    cc = models.EmailField(max_length=50, blank=True, null=True)
-    bcc = models.EmailField(max_length=50, blank=True, null=True)
 
     attachments = models.ManyToManyField(AttachmentFile, blank=True)
 

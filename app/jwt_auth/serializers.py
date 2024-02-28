@@ -5,7 +5,7 @@ from db_schema.models import *
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = ["id", "name", "label"]
+        fields = ["id", "role_id", "name"]
 
 class UserInfoSerializer(serializers.ModelSerializer):
     role = RoleSerializer(read_only=True)
