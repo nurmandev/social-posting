@@ -26,12 +26,13 @@ if ON_SERVER:
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost"]
+    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp"]
     CORS_ALLOWED_ORIGINS = [
-        "https://job-happy.com",
+        "https://stock-news.vercel.app",
+        "https://x162-43-49-87.static.xvps.ne.jp"
     ]
     CSRF_TRUSTED_ORIGINS = [
-        "https://x162-43-25-65.static.xvps.ne.jp"
+        "https://x162-43-49-87.static.xvps.ne.jp"
     ]
 else:
     CORS_ORIGIN_ALLOW_ALL = True
