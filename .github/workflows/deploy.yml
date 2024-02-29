@@ -1,0 +1,26 @@
+name: Deploy to Server
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: SSH into server and pull changes
+      uses: appleboy/ssh-action@master
+      with:
+        host: 162.43.49.87
+        username: stock_news
+        key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILX0YscTuvUzTVzHzANI6f9ynb192X2DYBKlZe/5HVSr akira.murayama.dev@gmail.com
+        port: 22
+        script: |
+          cd /var/www/server/cms-backend/
+          git pull origin master
