@@ -28,7 +28,7 @@ if ON_SERVER:
     )
     ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp"]
     CORS_ALLOWED_ORIGINS = [
-        "https://wavemaster.vercel.app/",
+        "https://wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
     ]
     CSRF_TRUSTED_ORIGINS = [
