@@ -17,10 +17,10 @@ jobs:
     - name: SSH into server and pull changes
       uses: appleboy/ssh-action@master
       with:
-        host: 162.43.49.87
-        username: root
-        password: stock-news$$2727
-        port: 22
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_SSH_KEY }}
+        port: ${{ secrets.SERVER_PORT }}
         script: |
           cd /var/www/server/cms-backend/
           git pull origin master
