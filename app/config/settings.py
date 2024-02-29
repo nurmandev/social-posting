@@ -22,6 +22,8 @@ SECRET_KEY = env("SECRET_KEY")
 DEBUG = True
 ON_SERVER = env("ON_SERVER", default=True)
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 if ON_SERVER:
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
