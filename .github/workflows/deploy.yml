@@ -18,8 +18,8 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: 162.43.49.87
-        username: stock_news
-        key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILX0YscTuvUzTVzHzANI6f9ynb192X2DYBKlZe/5HVSr akira.murayama.dev@gmail.com
+        username: root
+        password: stock-news$$2727
         port: 22
         script: |
           cd /var/www/server/cms-backend/
