@@ -9,8 +9,7 @@ from django.core.mail import EmailMessage
 
 from db_schema.models import *
 from db_schema.serializers import *
-
-from datetime import datetime
+import datetime
 
 def send_mail(request, email, token):
     m_user = User.objects.get(email=email)
