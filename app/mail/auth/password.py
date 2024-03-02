@@ -25,7 +25,7 @@ def send_mail(request, email, token):
         "expire_at": expire_at,
     })
 
-    message = reset_password_url
+    message = message
     email_obj = EmailMessage(
         mail_subject, message, to=[m_user.email]
     )
