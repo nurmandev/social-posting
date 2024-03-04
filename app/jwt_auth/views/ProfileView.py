@@ -15,8 +15,8 @@ class GetMyAccountInfoView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        serializer = UserSerializer(request.user).data
-        return Response({"me": serializer})
+        serializer = UserSerializer(request.user)
+        return Response({"me": serializer.data})
     
     
 class ProfileView(APIView):
@@ -25,17 +25,9 @@ class ProfileView(APIView):
     def get(self, request):
         
         try:
-            data = {
-                "last_name": request.user.user_info.last_name,
-                "first_name": request.user.user_info.first_name,
-                "last_name_furi": request.user.user_info.last_name_furi,
-                "first_name_furi": request.user.user_info.first_name_furi,
-                "email": request.user.email,
-                "phone": request.user.user_info.phone,
-                "role": request.user.user_info.role.id
-            }
+            serializer = UserFlatSerializer(request.user.user_info)
 
-            return Response(data, 200)
+            return Response(serializer.data, 200)
 
         except Exception as e:
             print(str(e))

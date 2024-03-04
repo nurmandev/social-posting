@@ -7,7 +7,7 @@ class IsAuthenticated(permissions.BasePermission):
 
     def has_permission(self, request, view):
         try:
-            if request.user.is_active:
+            if request.user.is_active and request.user.is_allowed:
                 return True
             else:
                 return False
