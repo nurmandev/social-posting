@@ -72,6 +72,96 @@ class CreateCustomerAPI(APIView):
             return Response({"msg": "Internal Server Error"}, status=400)
         
 
+
+class CreateMultiCustomerAPI(APIView):
+    permission_classes = [IsCustomer]
+    
+    def post(self, request):
+        data = dict(request.data)
+
+        try:
+            res = []
+            customers = data.get('data', [])
+
+            for customer in customers:
+                customer = dict(customer)
+                
+                name = customer.get('name', '')
+                if len(name.split(' ')) == 2:
+                    last_name = name.split(' ')[0]
+                    first_name = name.split(' ')[1]
+                else:
+                    last_name = name
+                    first_name = ''
+                email = customer.get('email', '')
+                phone = customer.get('phone', '')
+                email_2 = customer.get('email_2', '')
+                phone_2 = customer.get('phone_2', '')
+                ads = customer.get('ads', '')
+                deposit_date = customer.get('deposit_date', None)
+                contract_start_date = customer.get('contract_start_date', None)
+                contract_days = int(customer.get('contract_days', 0))
+                status = customer.get('status', '')
+                property = customer.get('property', '')
+                system_provided = customer.get('system_provided', False)
+                
+                try:
+                    
+                    if name == "" or email == "" or phone == "" or Customer.objects.filter(email=email).exists():
+                        raise Exception("Invalid Data")
+
+                    with transaction.atomic():
+                        # get last name and first name from name
+
+                        m_customer = Customer.objects.create(
+                            name = name,
+                            last_name = last_name,
+                            first_name = first_name,
+                            email = email,
+                            phone = phone,
+                            email_2 = email_2,
+                            phone_2 = phone_2,
+                            ads = ads,
+                            deposit_date = deposit_date,
+                            contract_start_date = contract_start_date,
+                            contract_days = contract_days,
+                            status = Status.objects.filter(name=status).first(),
+                            property = Property.objects.filter(name=property).first(),
+                            system_provided = True if system_provided == "OK" else False,
+                            manager = request.user
+                        )
+
+                        res.append({
+                            "data": CustomerSerializer(m_customer).data,
+                            "status": 200
+                        })
+                except Exception as e:
+                    print(str(e))
+                    res.append({
+                        "data": {
+                            "name": name,
+                            "email": email,
+                            "phone": phone,
+                            "email_2": email_2,
+                            "phone_2": phone_2,
+                            "ads": ads,
+                            "deposit_date": deposit_date,
+                            "contract_start_date": contract_start_date,
+                            "contract_days": contract_days,
+                            "status": status,
+                            "property": property,
+                            "system_provided": system_provided
+                        },
+                        "status": 400
+                    })
+
+
+            return Response(res)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": "Internal Server Error"}, status=400)
+        
+
 class UpdateCustomerAPI(APIView):
     permission_classes = [IsCustomer]
 

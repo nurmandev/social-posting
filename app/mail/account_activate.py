@@ -22,7 +22,7 @@ def send_mail(request, email):
     m_reset_token = RegisterToken(user_id=m_user.id, token=token, expire_at=(datetime.datetime.now()+ datetime.timedelta(days=90)))
     m_reset_token.save()
 
-    activate_url = f"http://localhost:3000/accounts/activate?token={token}"
+    activate_url = f"https://wavemaster.vercel.app/accounts/activate?token={token}"
     
     # Send the password reset email
     mail_subject = "システムに登録されました。"
