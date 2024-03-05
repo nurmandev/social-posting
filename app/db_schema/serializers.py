@@ -36,10 +36,10 @@ class CustomerFlatSerializer(serializers.ModelSerializer):
 
 class CustomerMemoSerializer(serializers.ModelSerializer):
     manager = UserSerializer(read_only=True)
-    
+
     class Meta:
         model = CustomerMemo
-        fields = ["id", "content", "manager", "created_at"]
+        fields = ["id", "content", "manager", "customer", "created_at"]
 
 
 class MailTemplateSerializer(serializers.ModelSerializer):

@@ -15,6 +15,7 @@ class GetCustomerMemoAPI(APIView):
     
     def get(self, request, customer_id):
         try:
+            print(request)
             m_data = CustomerMemo.objects.filter(customer__id=customer_id).order_by("-created_at")
             serializer = CustomerMemoSerializer(m_data, many=True)
 
