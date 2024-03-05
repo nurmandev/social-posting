@@ -57,6 +57,7 @@ class User(AbstractUser):
         ("customer", 'Customer Company'),
     ]
     permission = models.CharField(max_length=50, choices=PERMISSION_CHOICES, default="customer")
+    is_allowed = models.BooleanField(default=True)
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)

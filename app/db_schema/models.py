@@ -34,6 +34,7 @@ class Status(models.Model):
     
 
 class Customer(models.Model):
+    name = models.CharField(max_length=50, blank=True, null=True)
     last_name = models.CharField(max_length=50, blank=True, null=True)
     first_name = models.CharField(max_length=50, blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
@@ -65,8 +66,7 @@ class Customer(models.Model):
 class CustomerMemo(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
     manager = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
-    memo = models.TextField(blank=True, null=True)
-    memo_date = models.DateField(auto_now_add=True, blank=True, null=True)
+    content = models.TextField(blank=True, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

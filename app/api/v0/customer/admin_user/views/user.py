@@ -8,17 +8,19 @@ from db_schema.models import *
 from db_schema.serializers import *
 from utils.permissions import *
 from validations.user import *
+from mail.account_activate import *
 
 # Create your views here.
 class GetUsersAPI(APIView):
     permission_classes = [IsCustomerAndAdmin]
     
     def get(self, request):
-        page = request.GET.get('page', 1)
-        pageSize = request.GET.get('pageSize', 10)
+        keyword = request.GET.get('keyword', '')
+        page = int(request.GET.get('page', 1))
+        pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = User.objects.all()
+            m_data = User.objects.filter(Q(user_info__name__contains=keyword) | Q(email__contains=keyword)).order_by('id')
             serializer = UserSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
 
             return Response({
@@ -39,22 +41,30 @@ class CreateUserAPI(APIView):
             errors, status, clean_data = validate_create_user(request)
             
             if status != 200:
-                return Response(errors, status=status)
+                return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
                 user_info = UserInfo.objects.create(
                     name = clean_data["last_name"] + " " + clean_data["first_name"],
                     last_name=clean_data["last_name"],
                     first_name=clean_data["first_name"],
+                    name_furi = clean_data["last_name_furi"] + " " + clean_data["first_name_furi"],
+                    last_name_furi=clean_data["last_name_furi"],
+                    first_name_furi=clean_data["first_name_furi"],
                     phone=clean_data["phone"],
-                    role=Role.objects.get(role_id=clean_data["role"])
+                    role=Role.objects.get(id=clean_data["role"])
                 )
                 user = User.objects.create(
                     email=clean_data["email"],
-                    password=make_password(clean_data["password"]),
+                    password='',
                     user_info=user_info,
-                    permission="customer"
+                    permission="customer",
+                    is_active=False,
+                    is_allowed=clean_data['is_allowed']
                 )
+
+                # ※登録後、ユーザーにメールが送信されます。メール内のURLからアカウントの有効化を行ってください。
+                send_mail(request, clean_data["email"])
                 
                 serializer = UserSerializer(user)
 
@@ -74,7 +84,7 @@ class UpdateUserAPI(APIView):
         try:
             user = User.objects.get(id=user_id)
             
-            serializer = UserSerializer(user)
+            serializer = UserFlatSerializer(user.user_info)
 
             return Response(serializer.data, status=200)
 
@@ -87,16 +97,20 @@ class UpdateUserAPI(APIView):
             errors, status, clean_data = validate_update_user(request, user_id)
             
             if status != 200:
-                return Response(errors, status=status)
+                return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
                 user = User.objects.get(id=user_id)
                 user.email = clean_data["email"]
+                user.is_allowed = clean_data["is_allowed"]
                 user.user_info.name = clean_data["last_name"] + " " + clean_data["first_name"]
                 user.user_info.last_name = clean_data["last_name"]
                 user.user_info.first_name = clean_data["first_name"]
+                user.user_info.name_furi = clean_data["last_name_furi"] + " " + clean_data["first_name_furi"]
+                user.user_info.last_name_furi = clean_data["last_name_furi"]
+                user.user_info.first_name_furi = clean_data["first_name_furi"]
                 user.user_info.phone = clean_data["phone"]
-                user.user_info.role = Role.objects.get(role_id=clean_data["role"])
+                user.user_info.role = Role.objects.get(id=clean_data["role"])
                 user.save()
                 user.user_info.save()
                 

@@ -18,17 +18,28 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class CustomerSerializer(serializers.ModelSerializer):
+    property = PropertySerializer(read_only=True)
+    status = StatusSerializer(read_only=True)
+    manager = UserSerializer(read_only=True)
 
     class Meta:
         model = Customer
         fields = "__all__"
 
+class CustomerFlatSerializer(serializers.ModelSerializer):
+    manager = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Customer
+        exclude = ["created_at", "updated_at"]
+
 
 class CustomerMemoSerializer(serializers.ModelSerializer):
+    manager = UserSerializer(read_only=True)
 
     class Meta:
         model = CustomerMemo
-        fields = ["id", "memo", "memo_date"]
+        fields = ["id", "content", "manager", "customer", "created_at"]
 
 
 class MailTemplateSerializer(serializers.ModelSerializer):

@@ -103,7 +103,7 @@ def validate_reset_password(request):
             errors["confirm_password"] = "新しいパスワードが一致しません。"
 
         # check contains 8 characters, 1 uppercase, 1 lowercase, 1 number
-        if new_password != "" and (len(new_password) < 8 or new_password.isalpha() or new_password.isnumeric() or new_password.islower()):
+        if new_password != "" and (len(new_password) < 8 or new_password.isalpha() or new_password.isnumeric()):
             errors["new_password"] = "パスワードは8文字以上の英数字を含めてください。"
 
         status = 422 if len(errors) > 0 else 200

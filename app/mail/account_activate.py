@@ -8,28 +8,27 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django.contrib.auth.tokens import default_token_generator
 
+
 from db_schema.models import *
 from db_schema.serializers import *
 import datetime
 
-def send_mail(request, email, token):
+def send_mail(request, email):
     m_user = User.objects.get(email=email)
     
     token = default_token_generator.make_token(m_user)
     
-    ResetToken.objects.filter(user_id=m_user.id).delete()
-    m_reset_token = ResetToken(user_id=m_user.id, token=token, expire_at=(datetime.datetime.now()+ datetime.timedelta(days=3)))
+    RegisterToken.objects.filter(user_id=m_user.id).delete()
+    m_reset_token = RegisterToken(user_id=m_user.id, token=token, expire_at=(datetime.datetime.now()+ datetime.timedelta(days=90)))
     m_reset_token.save()
 
-    reset_password_url = f"https://wavemaster.vercel.app/accounts/password/reset?token={token}"
-    expire_at =  (datetime.datetime.now()+ datetime.timedelta(days=3)).strftime("%Y/%m/%d %H:%M")
+    activate_url = f"https://wavemaster.vercel.app/accounts/activate?token={token}"
     
     # Send the password reset email
-    mail_subject = "パスワードを設定・変更してください"
-    message = render_to_string("mail_template/password_forgot.html", {
+    mail_subject = "システムに登録されました。"
+    message = render_to_string("mail_template/account_activate.html", {
         "name": f"{m_user.user_info.name}",
-        "url": reset_password_url,
-        "expire_at": expire_at,
+        "url": activate_url,
     })
 
     message = message

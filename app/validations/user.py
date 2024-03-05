@@ -7,11 +7,13 @@ import re
 def validate_create_user(request):
     data = dict(request.data)
     email = data.get("email", "")
-    password = data.get("password", "")
     last_name = data.get("last_name", "")
     first_name = data.get("first_name", "")
+    last_name_furi = data.get("last_name_furi", "")
+    first_name_furi = data.get("first_name_furi", "")
     phone = data.get("phone", "")
-    role = data.get("role", "")
+    role = data.get("role", 0)
+    is_allowed = data.get("is_allowed", False)
 
     try:
         errors = {}
@@ -22,27 +24,26 @@ def validate_create_user(request):
         if email != "" and User.objects.filter(email=email).exists():
             errors["email"] = "このメールは既に登録されています。"
 
-        if password == "":
-            errors["password"] = "パスワードを入力してください。"
-
         if last_name == "":
             errors["last_name"] = "姓を入力してください。"
 
         if first_name == "":
             errors["first_name"] = "名を入力してください。"
 
-        if Role.objects.filter(role_id=role).exists() == False:
+        if Role.objects.filter(id=role).exists() == False:
             errors["role"] = "この権限は存在しません。"
 
 
         status = 422 if len(errors) > 0 else 200
         clean_data = {
             "email": email,
-            "password": password,
             "last_name": last_name,
             "first_name": first_name,
+            "last_name_furi": last_name_furi,
+            "first_name_furi": first_name_furi,
             "phone": phone,
-            "role": role
+            "role": role,
+            "is_allowed": is_allowed
         }
 
         return errors, status, clean_data
@@ -55,11 +56,13 @@ def validate_create_user(request):
 def validate_update_user(request, user_id):
     data = dict(request.data)
     email = data.get("email", "")
-    password = data.get("password", "")
     last_name = data.get("last_name", "")
     first_name = data.get("first_name", "")
+    last_name_furi = data.get("last_name_furi", "")
+    first_name_furi = data.get("first_name_furi", "")
     phone = data.get("phone", "")
     role = data.get("role", "")
+    is_allowed = data.get("is_allowed", False)
 
     try:
         errors = {}
@@ -70,27 +73,26 @@ def validate_update_user(request, user_id):
         if email != "" and User.objects.filter(Q(email=email), ~Q(id=user_id)).exists():
             errors["email"] = "このメールは既に登録されています。"
 
-        if password == "":
-            errors["password"] = "パスワードを入力してください。"
-
         if last_name == "":
             errors["last_name"] = "姓を入力してください。"
 
         if first_name == "":
             errors["first_name"] = "名を入力してください。"
 
-        if Role.objects.filter(role_id=role).exists() == False:
+        if Role.objects.filter(id=role).exists() == False:
             errors["role"] = "この権限は存在しません。"
 
 
         status = 422 if len(errors) > 0 else 200
         clean_data = {
             "email": email,
-            "password": password,
             "last_name": last_name,
             "first_name": first_name,
+            "last_name_furi": last_name_furi,
+            "first_name_furi": first_name_furi,
             "phone": phone,
-            "role": role
+            "role": role,
+            "is_allowed": is_allowed
         }
 
         return errors, status, clean_data
