@@ -20,7 +20,7 @@ class GetUsersAPI(APIView):
         pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = User.objects.filter(Q(user_info__name__contains=keyword) | Q(email__contains=keyword)).order_by('id')
+            m_data = User.objects.filter(Q(user_info__name__contains=keyword) | Q(email__contains=keyword), Q(permission="customer"), Q(is_active=True)).order_by('id')
             serializer = UserSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
 
             return Response({
