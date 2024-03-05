@@ -78,7 +78,7 @@ class UpdateCustomerAPI(APIView):
     def get(self, request, customer_id):
         try:
             customer = Customer.objects.get(id=customer_id)
-            serializer = CustomerSerializer(customer)
+            serializer = CustomerFlatSerializer(customer)
             return Response(serializer.data)
         except Exception as e:
             print(str(e))
