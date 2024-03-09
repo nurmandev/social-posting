@@ -12,5 +12,6 @@ django-css-inline
 pillow
 mysqlclient
 django-crontab
+django-mailbox
 docxtpl
 XlsxWriter
