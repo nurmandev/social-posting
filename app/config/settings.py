@@ -58,6 +58,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_swagger',       # Swagger 
     'drf_yasg',                     # Yet Another Swagger generator
     'django_crontab',
+    'django_mailbox'
 ]
 OUR_APPS = [
     "jwt_auth",
