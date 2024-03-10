@@ -26,7 +26,7 @@ if ON_SERVER:
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp"]
+    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "162.43.49.87"]
     CORS_ALLOWED_ORIGINS = [
         "https://wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
