@@ -186,9 +186,9 @@ REST_FRAMEWORK = {
 }
 
 # CRON Jobs Settings
-# run at 09:00 every day
+# run `python3 manage.py getmail` every 30s
 CRONJOBS = [
-    
+    ('*/30 * * * *', 'python3 manage.py getmail'),
 ]
 
 # JWT Settings
