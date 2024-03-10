@@ -12,7 +12,7 @@ from db_schema.models import *
 from db_schema.serializers import *
 import datetime
 
-def send_mail(request, email, token):
+def send_mail(request, email):
     m_user = User.objects.get(email=email)
     
     token = default_token_generator.make_token(m_user)
