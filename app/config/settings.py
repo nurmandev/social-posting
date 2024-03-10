@@ -57,8 +57,7 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_swagger',       # Swagger 
     'drf_yasg',                     # Yet Another Swagger generator
-    'django_crontab',
-    'django_mailbox'
+    'django_crontab'
 ]
 OUR_APPS = [
     "jwt_auth",
@@ -66,7 +65,8 @@ OUR_APPS = [
     "api.v0.customer.member",
     "api.v0.customer.admin_user",
     "api.v0.shared",
-    "db_schema"
+    "db_schema",
+    'django_mailbox'
 ]
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + OUR_APPS
 

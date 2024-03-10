@@ -307,3 +307,4 @@ CACHE/
 /static/shops/*
 
 /dev/*
+/media/mailbox_attachments/*
