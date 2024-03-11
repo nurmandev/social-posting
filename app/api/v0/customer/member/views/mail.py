@@ -7,16 +7,28 @@ from utils.permissions import *
 from django.db.models import *
 from django.db import transaction
 
-from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
 from django_mailbox.models import Message, Mailbox, MessageAttachment
-
+from ..serializers import *
 from db_schema.models import *
 from db_schema.serializers import *
 
 from ..tasks import send_email_task
 from validations.mail import validate_create_mail
 
+
+class GetMailsAPI(APIView):
+    permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]
+
+    def get(self, request):
+        try:
+            mails = Message.objects.filter()
+            serializer = MessageSerializer(mails, many=True)
+            return Response({
+                "mails": serializer.data
+            }, status=200)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": str(e)}, status=500)
 
 class CreateMailAPI(APIView):
     permission_classes = [IsCustomer]
