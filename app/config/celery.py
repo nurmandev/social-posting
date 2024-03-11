@@ -13,7 +13,7 @@ from celery import Celery
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
 # you change change the name here
-app = Celery("celery_app")
+app = Celery("config")
 
 # read config from Django settings, the CELERY namespace would make celery 
 # config keys has `CELERY` prefix
