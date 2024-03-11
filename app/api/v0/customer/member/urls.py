@@ -7,6 +7,7 @@ from .views.customer import *
 from .views.memo import *
 from .views.analysis import *
 from .views.mail_template import *
+from .views.mail import *
 router = DefaultRouter()
 
 
@@ -29,5 +30,11 @@ urlpatterns = [
     re_path(r'^mail_templates/$', GetMailTemplatesAPI.as_view(), name='get_mail_templates'),
     re_path(r'^mail_templates/create$', CreateMailTemplateAPI.as_view(), name='create_mail_template'),
     re_path(r'^mail_templates/(?P<mail_template_id>[0-9]+)$', UpdateMailTemplateAPI.as_view(), name='update_mail_template'),
+
+    # Mail
+    # re_path(r'^mails/$', GetMailsAPI.as_view(), name='get_mails'),
+    re_path(r'^mails/create$', CreateMailAPI.as_view(), name='create_mail'),
+    re_path(r'^mails/attachment/upload$', CreateAttachmentFileView.as_view(), name='create_mail_attachment'),
+    # re_path(r'^mails/(?P<mail_id>[0-9]+)$', UpdateMailAPI.as_view(), name='update_mail'),
 
 ]
