@@ -19,9 +19,20 @@ class GetCustomersAPI(APIView):
         order_by = request.GET.get('order_by', 'id')
         page = int(request.GET.get('page', 1))
         pageSize = int(request.GET.get('pageSize', 10))
+        status = int(request.GET.get('status', 0))
+        property = int(request.GET.get('property', 0))
 
         try:
-            m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword)).order_by(order_by)
+            m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
+            
+            if Status.objects.filter(id=status).exists():
+                m_data = m_data.filter(status=Status.objects.filter(id=status).first())
+
+            if Property.objects.filter(id=property).exists():
+                m_data = m_data.filter(property=Property.objects.filter(id=property).first())
+
+            m_data = m_data.order_by(order_by)
+            
             serializer = CustomerSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
 
             return Response({
