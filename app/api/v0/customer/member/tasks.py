@@ -33,13 +33,6 @@ def send_email_task(recepient, subject, body, attachment):
     m_box = Mailbox.objects.all().first()
 
     # save email_obj to Message
-    mail = Message.objects.create(
-        mailbox=m_box,
-        subject=mail_subject,
-        message_id=email_obj.message().get("Message-ID"),
-        from_header=f"{recepient_user.manager.user_info.name} <{email_obj.from_email}>",
-        to_header=f"{recepient_user.name} <{recepient_user.email}>",
-        body=body,
-        outgoing=True
-    )
-    
+    mail = Message(mailbox=m_box, subject=mail_subject, message_id=email_obj.message().get("Message-ID"), from_header=f"{recepient_user.manager.user_info.name} <{email_obj.from_email}>", to_header=f"{recepient_user.name} <{recepient_user.email}>", outgoing=True)
+    mail.set_body(body)
+    mail.save()    
