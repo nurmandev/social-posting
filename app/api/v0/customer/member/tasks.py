@@ -8,13 +8,12 @@ from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django_mailbox.models import Message, Mailbox, MessageAttachment
 from celery import shared_task
-from config.celery import app
 
 from db_schema.models import *
 from db_schema.serializers import *
 import datetime
 
-@app.task
+@shared_task
 def send_email_task(recepient, subject, body, attachment):
     recepient_user = Customer.objects.get(id=recepient)
     

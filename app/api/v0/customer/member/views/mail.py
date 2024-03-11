@@ -14,7 +14,7 @@ from django_mailbox.models import Message, Mailbox, MessageAttachment
 from db_schema.models import *
 from db_schema.serializers import *
 
-from mail.mailbox import send_email_task
+from ..tasks import send_email_task
 from validations.mail import validate_create_mail
 
 
