@@ -16,3 +16,4 @@ django-mailbox
 docxtpl
 XlsxWriter
 celery
+redis
