@@ -14,7 +14,12 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
 
 class MessageSerializer(serializers.ModelSerializer):
     attachments = MessageAttachmentSerializer(many=True)
+    body = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
         fields = "__all__"
+
+    def get_body(self, obj):
+
+        return obj.get_body()
