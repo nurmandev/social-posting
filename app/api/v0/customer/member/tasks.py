@@ -14,13 +14,13 @@ from db_schema.serializers import *
 import datetime
 
 @shared_task
-def send_email_task(recepient, subject, body, attachment):
-    recepient_user = Customer.objects.get(id=recepient)
+def send_email_task(recipient, subject, body, attachment):
+    recipient_user = Customer.objects.get(id=recipient)
     
     mail_subject = subject
 
     email_obj = EmailMessage(
-        mail_subject, body, to=[recepient_user.email]
+        mail_subject, body, to=[recipient_user.email]
     )
     email_obj.content_subtype = "html"
 
@@ -33,6 +33,6 @@ def send_email_task(recepient, subject, body, attachment):
     m_box = Mailbox.objects.all().first()
 
     # save email_obj to Message
-    mail = Message(mailbox=m_box, subject=mail_subject, message_id=email_obj.message().get("Message-ID"), from_header=f"{recepient_user.manager.user_info.name} <{email_obj.from_email}>", to_header=f"{recepient_user.name} <{recepient_user.email}>", outgoing=True)
+    mail = Message(mailbox=m_box, subject=mail_subject, message_id=email_obj.message().get("Message-ID"), from_header=f"{recipient_user.manager.user_info.name} <{email_obj.from_email}>", to_header=f"{recipient_user.name} <{recipient_user.email}>", outgoing=True)
     mail.set_body(body)
     mail.save()    

@@ -6,10 +6,19 @@ from django_mailbox.models import Message, MessageAttachment
 
 
 class MessageAttachmentSerializer(serializers.ModelSerializer):
+    document = serializers.SerializerMethodField()
 
     class Meta:
         model = MessageAttachment
         fields = ["id", "document"]
+
+    def get_document(self, obj):
+        
+        return {
+            "name": obj.document.file.name,
+            "url": obj.document.file.url,
+            "content_type": obj.document.file.content_type
+        }
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -22,4 +31,4 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def get_body(self, obj):
 
-        return obj.get_body()
+        return obj.html
