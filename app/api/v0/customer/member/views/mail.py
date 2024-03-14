@@ -41,8 +41,8 @@ class CreateMailAPI(APIView):
             if status != 200:
                 return Response({"errors": errors}, status=status)
 
-            for recepient in clean_data['recepients']:
-                send_email_task.delay(recepient, clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            for recipient in clean_data['recipients']:
+                send_email_task.delay(recipient, clean_data['subject'], clean_data['body'], clean_data['attachment'])
 
             return Response({
                 "msg": ""

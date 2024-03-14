@@ -6,7 +6,7 @@ import re
 
 def validate_create_mail(request):
     data = dict(request.data)
-    recepients = data.get("recepients", [])
+    recipients = data.get("recipients", [])
     subject = data.get("subject", "")
     body = data.get("body", "")
     attachment = data.get("attachment", [])
@@ -15,8 +15,8 @@ def validate_create_mail(request):
     try:
         errors = {}
 
-        if len(recepients) == 0:
-            errors["recepients"] = "受信者を入力してください"
+        if len(recipients) == 0:
+            errors["recipients"] = "受信者を入力してください"
 
         if subject == "":
             errors["subject"] = "件名を入力してください"
@@ -26,7 +26,7 @@ def validate_create_mail(request):
 
         status = 422 if len(errors) > 0 else 200
         clean_data = {
-            "recepients": recepients,
+            "recipients": recipients,
             "subject": subject,
             "body": body,
             "attachment": attachment
