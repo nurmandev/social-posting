@@ -17,10 +17,10 @@ class GetCustomersAPI(APIView):
     def get(self, request):
         keyword = request.GET.get('keyword', '')
         order_by = request.GET.get('order_by', 'id')
-        page = int(request.GET.get('page', 1))
-        pageSize = int(request.GET.get('pageSize', 10))
         status = int(request.GET.get('status', 0))
         property = int(request.GET.get('property', 0))
+        page = int(request.GET.get('page', 1))
+        pageSize = int(request.GET.get('pageSize', 10))
 
         try:
             m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
