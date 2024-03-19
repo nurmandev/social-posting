@@ -25,7 +25,7 @@ class CreateMailAPI(APIView):
                 return Response({"errors": errors}, status=status)
 
             recipients = Customer.objects.filter(id__in=clean_data['recipients'])
-            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachments'])
 
             # recipients = Customer.objects.filter(id__in=clean_data['recipients'])
             # recipients = list(recipients)
@@ -60,7 +60,7 @@ class CreateGroupMailAPI(APIView):
                 recipients = Customer.objects.filter(property=Property.objects.get(id=clean_data['group']))
                 
                 
-            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachments'])
             
             # chunk the recipients into 1000 sublists
             # recipients = list(recipients)
@@ -88,8 +88,16 @@ class CreateAttachmentFileView(APIView):
                 return Response({"msg": "File is required"}, status=400)
             
             with transaction.atomic():
+                # get Content-Type from the file
+                file = request.data['file']
+
+                headers = f"""Content-Type: {file.content_type}; name="{file.name}"
+                Content-Disposition: attachment; filename="{file.name}"
+                Content-Transfer-Encoding: base64"""
+
                 m_attach = MessageAttachment.objects.create(
-                    document=request.data['file']
+                    document=request.data['file'],
+                    headers=headers
                 )
         
             return Response(MessageAttachmentSerializer(m_attach).data, status=200)

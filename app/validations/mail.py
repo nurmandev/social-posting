@@ -9,7 +9,7 @@ def validate_create_mail(request):
     recipients = data.get("recipients", [])
     subject = data.get("subject", "")
     body = data.get("body", "")
-    attachment = data.get("attachment", [])
+    attachments = data.get("attachments", [])
     
 
     try:
@@ -29,7 +29,7 @@ def validate_create_mail(request):
             "recipients": recipients,
             "subject": subject,
             "body": body,
-            "attachment": attachment
+            "attachments": attachments
         }
 
         return errors, status, clean_data
@@ -46,7 +46,7 @@ def validate_create_group_mail(request):
     group_type = data.get("group_type", "status")
     subject = data.get("subject", "")
     body = data.get("body", "")
-    attachment = data.get("attachment", [])
+    attachments = data.get("attachments", [])
     
 
     try:
@@ -70,7 +70,7 @@ def validate_create_group_mail(request):
             "group_type": group_type,
             "subject": subject,
             "body": body,
-            "attachment": attachment
+            "attachments": attachments
         }
 
         return errors, status, clean_data

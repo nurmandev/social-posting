@@ -21,8 +21,10 @@ def send_email_task(recepients, subject, body, attachment):
     )
     email_obj.content_subtype = "html"
 
+    print(attachment)
     for attach_id in attachment:
         m_attach = MessageAttachment.objects.get(id = attach_id)
+        print(m_attach.document.file.name)
         email_obj.attach(m_attach.document.file.name, m_attach.document.file.read(), m_attach.document.file.content_type)
 
     email_obj.send()
