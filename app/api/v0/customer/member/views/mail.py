@@ -134,10 +134,10 @@ class GetMailsByCustomer(APIView):
         
 class MakeMailAsRead(APIView):
     permission_classes = [IsCustomer]
-    
+
     def post(self, request, mail_id):
         try:
-            m_mail = Mail.objects.filter(id=mail_id, manager=request.user).first()
+            m_mail = Mail.objects.filter(id=mail_id, managers=request.user).first()
             if m_mail is None:
                 raise Exception("Mail not found")
 
