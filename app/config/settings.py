@@ -191,9 +191,9 @@ REST_FRAMEWORK = {
 }
 
 # CRON Jobs Settings
-# run `python3 manage.py getmail` every 30s
+# run cron.mail.py every 5 s
 CRONJOBS = [
-    ('*/30 * * * *', 'python3 manage.py getmail'),
+    ('*/5 * * * *', 'cron.mail.process_mail', '>> /var/log/cron.log')
 ]
 
 # JWT Settings
