@@ -21,6 +21,16 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ["id", "user_id", 'email', "user_info", "created_at", "updated_at", 'is_active', 'is_allowed', 'permission']
         
+class UserNameSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ["id", 'email', "name"]
+
+    def get_name(self, obj):
+        obj = User.objects.get(id=obj.id)
+        return obj.user_info.name
         
 class UserFlatSerializer(serializers.ModelSerializer):
     id = serializers.SerializerMethodField(read_only=True)

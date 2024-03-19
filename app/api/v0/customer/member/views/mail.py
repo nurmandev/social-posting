@@ -21,16 +21,16 @@ class GetInboxMailsAPI(APIView):
 
     def get(self, request):
         try:
-            m_emails = Customer.objects.all().values_list("email", flat=True)
+            page = int(request.GET.get('page', 1))
+            pageSize = int(request.GET.get('pageSize', 20))
 
-            m_mails = Message.objects.filter(outgoing=False, from_address__in=m_emails).values_list("from_address", flat=True)
-
-            print(m_mails)
-            # serializer = MessageSerializer(mails, many=True)
+            messages  = Mail.objects.filter(outgoing=False).order_by('-processed')
             
+            serializer = MailSerializer(messages[(page-1)*pageSize : page*pageSize] , many=True)
+
             return Response({
-                # "data": serializer.data,
-                # "total": mails.count()
+                "data": serializer.data,
+                "total": messages.count()
             }, status=200)
         except Exception as e:
             print(str(e))

@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from django_mailbox.models import Message, Mailbox, MessageAttachment
+from django.db.models import *
 
 from .models import *
 from jwt_auth.serializers import *
@@ -26,6 +28,12 @@ class CustomerSerializer(serializers.ModelSerializer):
         model = Customer
         fields = "__all__"
 
+class CustomerNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Customer
+        fields = ["id", "name", "email"]
+
 class CustomerFlatSerializer(serializers.ModelSerializer):
     manager = UserSerializer(read_only=True)
 
@@ -48,18 +56,20 @@ class MailTemplateSerializer(serializers.ModelSerializer):
         model = MailTemplate
         fields = ["id", "subject", "body", "publisher"]
 
+class MessageAttachmentSerializer(serializers.ModelSerializer):
 
-class AttachmentFileSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = AttachmentFile
-        fields = ['id', 'file', "is_used"]
+        model = MessageAttachment
+        fields = "__all__"
 
 
 class MailSerializer(serializers.ModelSerializer):
-    customer = CustomerSerializer(read_only=True)
-    manager = UserSerializer(read_only=True)
-    attachments = AttachmentFileSerializer(read_only=True)
+    customers = CustomerNameSerializer(many=True)
+    managers = UserNameSerializer(many=True)
+    attachments = MessageAttachmentSerializer(many=True)
+
     class Meta:
         model = Mail
         fields = "__all__"
+
