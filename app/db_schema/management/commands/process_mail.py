@@ -39,7 +39,7 @@ class Command(BaseCommand):
                         outgoing=False,
                         read=None,
                         subject=message.subject,
-                        body=message.text,
+                        body=message.get_body(),
                         processed=message.processed
                     )
 
