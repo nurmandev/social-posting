@@ -77,6 +77,7 @@ class MailSerializer(serializers.ModelSerializer):
 
 class MailInboxSerializer(serializers.ModelSerializer):
     last_message = serializers.SerializerMethodField()
+    message_cnt = serializers.SerializerMethodField()
     class Meta:
         model = Customer
         fields = "__all__"
@@ -89,3 +90,7 @@ class MailInboxSerializer(serializers.ModelSerializer):
             return MailSerializer(m_message).data
 
         return None
+    
+    def get_message_cnt(self, obj):
+        m_messages = Mail.objects.filter(customers__id=obj.id)
+        return m_messages.count()
