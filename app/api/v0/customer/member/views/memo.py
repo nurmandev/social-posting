@@ -15,8 +15,7 @@ class GetCustomerMemoAPI(APIView):
     
     def get(self, request, customer_id):
         try:
-            print(request)
-            m_data = CustomerMemo.objects.filter(customer__id=customer_id).order_by("-created_at")
+            m_data = CustomerMemo.objects.filter(customer__id=customer_id, customer__manager=request.user).order_by("-created_at")
             serializer = CustomerMemoSerializer(m_data, many=True)
 
             return Response({
@@ -66,7 +65,10 @@ class UpdateCustomerMemoAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
-                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id).first()
+                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id, customer__manager=request.user).first()
+                if memo is None:
+                    raise Exception("メモが見つかりません。")
+                
                 memo.content = clean_data["content"]
                 memo.save()
 
@@ -83,7 +85,10 @@ class UpdateCustomerMemoAPI(APIView):
     def delete(self, request, customer_id, memo_id):
         try:
             with transaction.atomic():
-                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id).first()
+                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id, customer__manager=request.user).first()
+                if memo is None:
+                    raise Exception("メモが見つかりません。")
+                
                 memo.delete()
 
                 return Response("メモが削除されました。", status=200)
