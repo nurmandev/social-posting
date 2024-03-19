@@ -33,7 +33,9 @@ class GetInboxMailsAPI(APIView):
 
             return Response({
                 "data": serializer.data,
-                "total": m_customers.count()
+                "total": m_customers.count(),
+                "message_unread": Mail.objects.filter(outgoing=False, read=None, managers=request.user).count(),
+                "message_total": Mail.objects.filter(managers=request.user).count()
             }, status=200)
         except Exception as e:
             print(str(e))
