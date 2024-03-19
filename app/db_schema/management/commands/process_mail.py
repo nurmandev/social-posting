@@ -35,11 +35,12 @@ class Command(BaseCommand):
                     continue
 
                 with transaction.atomic():
+                    
                     m_mail = Mail.objects.create(
                         outgoing=False,
                         read=None,
                         subject=message.subject,
-                        body=message.get_body(),
+                        body=message.text if message.html is None else message.html,
                         processed=message.processed
                     )
 

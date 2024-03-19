@@ -52,7 +52,7 @@ def send_email_task(recepients, subject, body, attachment):
             outgoing=True,
             read=datetime.now(),
             subject=message.subject,
-            body=message.get_body(),
+            body=message.text if message.html is None else message.html,
             processed=message.processed
         )
 
