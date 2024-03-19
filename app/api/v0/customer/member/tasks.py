@@ -30,4 +30,42 @@ def send_email_task(recepients, subject, body, attachment):
     m_box = Mailbox.objects.all().first()
 
     # save email_obj to Message
-    m_box.record_outgoing_message(email_obj.message())
+    message = m_box.record_outgoing_message(email_obj.message())
+
+    if message.outgoing:
+        m_customers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses))
+    else:
+        m_customers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address))
+    
+    if message.outgoing:
+        m_managers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses)).values_list('manager', flat=True)
+        m_managers = User.objects.filter(id__in=m_managers)
+    else:
+        m_managers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address)).values_list('manager', flat=True)
+        m_managers = User.objects.filter(id__in=m_managers)
+
+    if m_customers.count() == 0 or m_managers.count() == 0:
+        return
+
+    with transaction.atomic():
+        m_mail = Mail.objects.create(
+            outgoing=True,
+            read=True,
+            subject=message.subject,
+            body=message.text,
+            processed=message.processed
+        )
+
+        m_attachments = MessageAttachment.objects.filter(message=message)
+        for attach  in m_attachments:
+            m_mail.attachments.add(attach)
+
+        for customer in m_customers:
+            customer.last_contacted = message.processed
+            customer.save()
+            m_mail.customers.add(customer)
+
+        for manager in m_managers:
+            m_mail.managers.add(manager)
+
+        print(m_mail)

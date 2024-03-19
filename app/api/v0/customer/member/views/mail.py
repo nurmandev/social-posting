@@ -24,7 +24,12 @@ class GetInboxMailsAPI(APIView):
             page = int(request.GET.get('page', 1))
             pageSize = int(request.GET.get('pageSize', 20))
 
-            messages  = Mail.objects.filter(outgoing=False).order_by('-processed')
+            # get incoming mails according to customers
+            m_customer_ids = Mail.objects.filter(outgoing=False).values_list('customers', flat=True)
+
+            m_customers = Customer.objects.filter(id__in=m_customer_ids)
+
+            messages  = Mail.objects.filter(outgoing=False).order_by('-created_at')
             
             serializer = MailSerializer(messages[(page-1)*pageSize : page*pageSize] , many=True)
 

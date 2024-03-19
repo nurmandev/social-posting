@@ -53,6 +53,8 @@ class Customer(models.Model):
     manager = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     system_provided = models.BooleanField(default=True)
 
+    last_contacted = models.DateTimeField(blank=True, null=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -104,6 +106,7 @@ class Mail(models.Model):
     # mail type is inbound or outbound
     outgoing = models.BooleanField(default=False)
     read = models.DateTimeField(blank=True, null=True)
+    processed = models.DateTimeField(blank=True, null=True)
     
     subject = models.CharField(max_length=255, blank=True, null=True)
     body = models.TextField(blank=True, null=True)
