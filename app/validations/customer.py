@@ -40,7 +40,6 @@ def validate_create_customer(request):
             errors["phone"] = "電話番号を入力してください。"
            
 
-        status = 422 if len(errors) > 0 else 200
         clean_data = {
             "last_name": last_name,
             "first_name": first_name,
@@ -57,6 +56,8 @@ def validate_create_customer(request):
             "system_provided": system_provided
         }
 
+        status = 422 if len(errors) > 0 else 200
+        
         return errors, status, clean_data
         
     except Exception as e:
@@ -99,7 +100,6 @@ def validate_update_customer(request, customer_id):
         if phone == "":
             errors["phone"] = "電話番号を入力してください。"
 
-        status = 422 if len(errors) > 0 else 200
         clean_data = {
             "last_name": last_name,
             "first_name": first_name,
@@ -115,6 +115,8 @@ def validate_update_customer(request, customer_id):
             "property": property,
             "system_provided": system_provided
         }
+
+        status = 422 if len(errors) > 0 else 200
 
         return errors, status, clean_data
         

@@ -23,7 +23,7 @@ class GetCustomersAPI(APIView):
         pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
+            m_data = Customer.objects.filter(Q(manager=request.user), Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
             
             if Status.objects.filter(id=status).exists():
                 m_data = m_data.filter(status=Status.objects.filter(id=status).first())
@@ -178,7 +178,11 @@ class UpdateCustomerAPI(APIView):
 
     def get(self, request, customer_id):
         try:
-            customer = Customer.objects.get(id=customer_id)
+            customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
+            
+            if customer is None:
+                raise Exception("データが見つかりません。")
+            
             serializer = CustomerFlatSerializer(customer)
             return Response(serializer.data)
         except Exception as e:
@@ -195,7 +199,11 @@ class UpdateCustomerAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
-                customer = Customer.objects.get(id=customer_id)
+                customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
+                
+                if customer is None:
+                    raise Exception("データが見つかりません。")
+                
                 customer.name = clean_data["last_name"] + " " + clean_data["first_name"]
                 customer.last_name = clean_data["last_name"]
                 customer.first_name = clean_data["first_name"]
@@ -222,7 +230,10 @@ class UpdateCustomerAPI(APIView):
     
     def delete(self, request, customer_id):
         try:
-            customer = Customer.objects.get(id=customer_id)
+            customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
+            if customer is None:
+                raise Exception("データが見つかりません。")
+            
             customer.delete()
             return Response({
                 "msg": "顧客情報が正常に削除されました。"
