@@ -8,6 +8,8 @@ from .views.memo import *
 from .views.analysis import *
 from .views.mail_template import *
 from .views.mail import *
+from .views.mail_sent import *
+from .views.mail_inbox import *
 router = DefaultRouter()
 
 
@@ -37,6 +39,9 @@ urlpatterns = [
     re_path(r'^mails/inbox/(?P<mail_id>[0-9]+)/read$', MakeMailAsRead.as_view(), name='make_mail_as_read'),
     
     re_path(r'^mails/sent$', GetSentMailsAPI.as_view(), name='get_sent_mails'),
+    re_path(r'^mails/sent/(?P<mail_id>[0-9]+)$', GetSentMailAPI.as_view(), name='get_sent_mail'),
+
+
     re_path(r'^mails/new_send$', CreateMailAPI.as_view(), name='create_mail'),
     re_path(r'^mails/group_send$', CreateGroupMailAPI.as_view(), name='create_mail'),
     re_path(r'^mails/attachment/upload$', CreateAttachmentFileView.as_view(), name='create_mail_attachment'),
