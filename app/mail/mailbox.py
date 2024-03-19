@@ -1,27 +1,23 @@
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from utils.permissions import *
 from django.db.models import *
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django_mailbox.models import Message, Mailbox, MessageAttachment
-from celery import shared_task
 from config.celery import app
 
 from db_schema.models import *
 from db_schema.serializers import *
-import datetime
 
-@app.task
-def send_email_task(recepient, subject, body, attachment):
-    recepient_user = Customer.objects.get(id=recepient)
+# @app.task
+def send_email_task(recepients, subject, body, attachment):
+    recepient_users = Customer.objects.filter(id__in=recepients)
     
     mail_subject = subject
 
     email_obj = EmailMessage(
-        mail_subject, body, to=[recepient_user.email]
+        mail_subject, body, to=[recepient_user.email for recepient_user in recepient_users]
     )
     email_obj.content_subtype = "html"
 
@@ -34,13 +30,4 @@ def send_email_task(recepient, subject, body, attachment):
     m_box = Mailbox.objects.all().first()
 
     # save email_obj to Message
-    mail = Message.objects.create(
-        mailbox=m_box,
-        subject=mail_subject,
-        message_id=email_obj.message().get("Message-ID"),
-        from_header=f"{recepient_user.manager.user_info.name} <{email_obj.from_email}>",
-        to_header=f"{recepient_user.name} <{recepient_user.email}>",
-        body=body,
-        outgoing=True
-    )
-    
+    m_box.record_outgoing_message(email_obj.message())

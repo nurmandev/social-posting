@@ -16,6 +16,7 @@ class Command(BaseCommand):
         m_messages = Message.objects.filter(Q(from_header__contains='<')|Q(to_header__contains='<'))
 
         for m_message in m_messages:
-            m_message.from_header = m_message.from_address
-            m_message.to_header = m_message.to_addresses
-            m_message.save()
+            pass
+            # m_message.from_header = m_message.from_address
+            # m_message.to_header = m_message.to_addresses
+            # m_message.save()
