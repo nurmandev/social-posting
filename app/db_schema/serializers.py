@@ -64,6 +64,7 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+
 class MailSerializer(serializers.ModelSerializer):
     customers = CustomerNameSerializer(many=True)
     managers = UserNameSerializer(many=True)
@@ -73,3 +74,24 @@ class MailSerializer(serializers.ModelSerializer):
         model = Mail
         fields = "__all__"
 
+
+class MailInboxSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    class Meta:
+        model = Customer
+        fields = "__all__"
+
+    def get_last_message(self, obj):
+        m_messages = Mail.objects.filter(customers__id=obj.id).order_by('-processed')
+        if m_messages.exists():
+            
+            m_message = m_messages.first()
+            return {
+                "id": m_message.id,
+                "subject": m_message.subject,
+                "body": m_message.body,
+                "processed": m_message.processed,
+                "read": m_message.read
+            }
+
+        return None

@@ -39,7 +39,8 @@ class Command(BaseCommand):
                         outgoing=False,
                         read=None,
                         subject=message.subject,
-                        body=message.text
+                        body=message.text,
+                        processed=message.processed
                     )
 
                     m_attachments = MessageAttachment.objects.filter(message=message)
@@ -47,6 +48,8 @@ class Command(BaseCommand):
                         m_mail.attachments.add(attach)
 
                     for customer in m_customers:
+                        customer.last_contacted = message.processed
+                        customer.save()
                         m_mail.customers.add(customer)
 
                     for manager in m_managers:
