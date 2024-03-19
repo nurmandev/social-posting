@@ -47,9 +47,16 @@ class CreateMailAPI(APIView):
             if status != 200:
                 return Response({"errors": errors}, status=status)
 
-            for recipient in clean_data['recipients']:
-                send_email_task.delay(recipient, clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            recipients = Customer.objects.filter(id__in=clean_data['recipients'])
+            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
 
+            # recipients = Customer.objects.filter(id__in=clean_data['recipients'])
+            # recipients = list(recipients)
+            # recipients = [recipients[i:i + 1000] for i in range(0, len(recipients), 1000)]
+                
+            # for sub_recipients in recipients:
+            #     send_email_task.delay([r.id for r in sub_recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            
             return Response({
                 "msg": "メールを送信しました。"
             }, status=200)
@@ -75,8 +82,15 @@ class CreateGroupMailAPI(APIView):
             if clean_data['group_type'] == "property":
                 recipients = Customer.objects.filter(property=Property.objects.get(id=clean_data['group']))
                 
-            for recipient in recipients:
-                send_email_task.delay(recipient.id, clean_data['subject'], clean_data['body'], clean_data['attachment'])
+                
+            send_email_task([r.id for r in recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
+            
+            # chunk the recipients into 1000 sublists
+            # recipients = list(recipients)
+            # recipients = [recipients[i:i + 1000] for i in range(0, len(recipients), 1000)]
+                
+            # for sub_recipients in recipients:
+            #     send_email_task.delay([r.id for r in sub_recipients], clean_data['subject'], clean_data['body'], clean_data['attachment'])
 
             return Response({
                 "msg": "メールを送信しました。"
