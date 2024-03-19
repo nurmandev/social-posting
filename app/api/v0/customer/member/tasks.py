@@ -5,10 +5,10 @@ from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage
 from django_mailbox.models import Message, Mailbox, MessageAttachment
-from config.celery import app
 
 from db_schema.models import *
 from db_schema.serializers import *
+from datetime import datetime
 
 # @app.task
 def send_email_task(recepients, subject, body, attachment):
@@ -50,7 +50,7 @@ def send_email_task(recepients, subject, body, attachment):
     with transaction.atomic():
         m_mail = Mail.objects.create(
             outgoing=True,
-            read=True,
+            read=datetime.now(),
             subject=message.subject,
             body=message.text,
             processed=message.processed
@@ -67,5 +67,3 @@ def send_email_task(recepients, subject, body, attachment):
 
         for manager in m_managers:
             m_mail.managers.add(manager)
-
-        print(m_mail)

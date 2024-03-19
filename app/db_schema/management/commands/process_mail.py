@@ -37,7 +37,7 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     m_mail = Mail.objects.create(
                         outgoing=False,
-                        read=False,
+                        read=None,
                         subject=message.subject,
                         body=message.text,
                         processed=message.processed
