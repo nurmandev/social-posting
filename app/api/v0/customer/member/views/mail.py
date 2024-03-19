@@ -86,11 +86,11 @@ class CreateAttachmentFileView(APIView):
     def post(self, request):
     
         try:
-            if request.data.get('file') is None:
+            if request.data['file'] is None:
                 return Response({"msg": "File is required"}, status=400)
             
             m_attach = MessageAttachment.objects.create(
-                document=request.data.get('file')
+                document=request.data['file']
             )
         
             return Response(MessageAttachmentSerializer(m_attach).data, status=200)
