@@ -93,10 +93,7 @@ class CreateAttachmentFileView(APIView):
                 document=request.data.get('file')
             )
         
-            return Response({
-                "success": True,
-                "id": m_attach.id
-            }, status=200)
+            return Response(MessageAttachmentSerializer(m_attach).data, status=200)
         
         except Exception as e:
             print(str(e))
