@@ -41,6 +41,29 @@ class GetInboxMailsAPI(APIView):
             print(str(e))
             return Response({"msg": str(e)}, status=500)
 
+
+class GetSentMailsAPI(APIView):
+    permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]
+
+    def get(self, request):
+        try:
+            page = int(request.GET.get('page', 1))
+            pageSize = int(request.GET.get('pageSize', 20))
+
+            # get incoming mails according to customers
+            m_mails = Mail.objects.filter(outgoing=True)
+
+            serializer = MailSerializer(m_mails[(page-1)*pageSize : page*pageSize] , many=True)
+
+            return Response({
+                "data": serializer.data,
+                "total": m_mails.count()
+            }, status=200)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": str(e)}, status=500)
+
+
 class CreateMailAPI(APIView):
     permission_classes = [IsCustomer]
 
