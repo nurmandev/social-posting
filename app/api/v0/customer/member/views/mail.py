@@ -8,10 +8,8 @@ from django.db.models import *
 from django.db import transaction
 
 from django_mailbox.models import Message, Mailbox, MessageAttachment
-from ..serializers import *
 from db_schema.models import *
 from db_schema.serializers import *
-from datetime import datetime
 from ..tasks import send_email_task
 from validations.mail import *
 
@@ -89,9 +87,10 @@ class CreateAttachmentFileView(APIView):
             if request.data['file'] is None:
                 return Response({"msg": "File is required"}, status=400)
             
-            m_attach = MessageAttachment.objects.create(
-                document=request.data['file']
-            )
+            with transaction.atomic():
+                m_attach = MessageAttachment.objects.create(
+                    document=request.data['file']
+                )
         
             return Response(MessageAttachmentSerializer(m_attach).data, status=200)
         
