@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django_mailbox.models import Message, Mailbox, MessageAttachment
 from django.db.models import *
-
+import re
 from .models import *
 from jwt_auth.serializers import *
 
@@ -57,11 +57,33 @@ class MailTemplateSerializer(serializers.ModelSerializer):
         fields = ["id", "subject", "body", "publisher"]
 
 class MessageAttachmentSerializer(serializers.ModelSerializer):
-
+    info = serializers.SerializerMethodField()
 
     class Meta:
         model = MessageAttachment
         fields = "__all__"
+
+    def get_info(self, obj):
+        m_attach = MessageAttachment.objects.get(id = obj.id)
+
+        text = m_attach.headers
+        
+        content_type_match = re.search(r'Content-Type:\s*([^;]+)', text)
+        if content_type_match:
+            content_type = content_type_match.group(1)
+        else:
+            content_type = "unknown"
+
+        name_match = re.search(r'name="([^"]+)"', text)
+        if name_match:
+            name = name_match.group(1)
+        else:
+            name = "unknown"
+
+        return {
+            "content_type": content_type,
+            "name": name
+        }
 
 
 

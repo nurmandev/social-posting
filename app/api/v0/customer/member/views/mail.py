@@ -115,8 +115,12 @@ class GetMailsByCustomer(APIView):
             if m_customer is None:
                 raise Exception("Customer not found")
             
-            m_mails = Mail.objects.filter(customers=m_customer).order_by('-processed')
+            m_mails = Mail.objects.filter(customers=m_customer).order_by('processed')
             serializer = MailSerializer(m_mails, many=True)
+
+            for mail in m_mails:
+                for attach in mail.attachments.all():
+                    print(attach.document.url)
 
             return Response({
                 "data": serializer.data,
