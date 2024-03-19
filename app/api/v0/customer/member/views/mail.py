@@ -105,6 +105,28 @@ class CreateGroupMailAPI(APIView):
             return Response({"msg": str(e)}, status=500)
         
 
+class GetMailsByCustomer(APIView):
+    permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]
+
+    def get(self, request, customer_id):
+        try:
+            m_customer = Customer.objects.get(id=customer_id, manager=request.user)
+            
+            if m_customer is None:
+                raise Exception("Customer not found")
+            
+            m_mails = Mail.objects.filter(customers=m_customer).order_by('-processed')
+            serializer = MailSerializer(m_mails, many=True)
+
+            return Response({
+                "data": serializer.data,
+                "total": m_mails.count(),
+                "customer": CustomerSerializer(m_customer).data
+            }, status=200)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": str(e)}, status=500)
+
         
 class CreateAttachmentFileView(APIView):
     # permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]

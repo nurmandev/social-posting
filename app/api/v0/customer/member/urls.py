@@ -33,6 +33,7 @@ urlpatterns = [
 
     # Mail
     re_path(r'^mails/inbox$', GetInboxMailsAPI.as_view(), name='get_mails'),
+    re_path(r'^mails/inbox/(?P<customer_id>[0-9]+)$', GetMailsByCustomer.as_view(), name='get_mails_by_customer'),
     re_path(r'^mails/sent$', GetInboxMailsAPI.as_view(), name='get_mails'),
     re_path(r'^mails/new_send$', CreateMailAPI.as_view(), name='create_mail'),
     re_path(r'^mails/group_send$', CreateGroupMailAPI.as_view(), name='create_mail'),
