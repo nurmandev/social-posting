@@ -86,12 +86,6 @@ class MailInboxSerializer(serializers.ModelSerializer):
         if m_messages.exists():
             
             m_message = m_messages.first()
-            return {
-                "id": m_message.id,
-                "subject": m_message.subject,
-                "body": m_message.body,
-                "processed": m_message.processed,
-                "read": m_message.read
-            }
+            return MailSerializer(m_message).data
 
         return None
