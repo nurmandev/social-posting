@@ -24,6 +24,8 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     attachments = MessageAttachmentSerializer(many=True)
     body = serializers.SerializerMethodField()
+    sender = serializers.SerializerMethodField()
+    receiver = serializers.SerializerMethodField()
 
     class Meta:
         model = Message
@@ -32,3 +34,13 @@ class MessageSerializer(serializers.ModelSerializer):
     def get_body(self, obj):
 
         return obj.html
+    
+    
+    def get_sender(self, obj):
+
+        return obj.from_address
+    
+    
+    def get_receiver(self, obj):
+
+        return obj.to_address
