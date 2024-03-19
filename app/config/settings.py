@@ -26,12 +26,13 @@ if ON_SERVER:
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "162.43.49.87"]
+    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "wavemaster.vercel.app", "162.43.49.87"]
     CORS_ALLOWED_ORIGINS = [
         "https://wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
     ]
     CSRF_TRUSTED_ORIGINS = [
+        "https://wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
     ]
 else:
@@ -193,7 +194,7 @@ REST_FRAMEWORK = {
 # CRON Jobs Settings
 # run cron.mail.py every 5 s
 CRONJOBS = [
-    ('*/5 * * * *', 'cron.mail.process_mail', '>> /var/log/cron.log')
+    
 ]
 
 # JWT Settings
