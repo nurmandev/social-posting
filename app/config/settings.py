@@ -216,3 +216,24 @@ if ON_SERVER:
 else:
     EMAIL_BACKEND = 'jwt_auth.backend.LoggingEmailBackend'
     
+
+# Maximum size in bytes allowed for uploaded files.
+# Adjust this according to your needs.
+# For example, to allow a maximum file size of 10MB:
+# 10MB = 10 * 1024 * 1024 bytes
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+
+# Maximum size in bytes allowed for a single file uploaded via a multipart/form-data request.
+# Adjust this according to your needs.
+# For example, to allow a maximum file size of 50MB:
+# 50MB = 50 * 1024 * 1024 bytes
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
+
+# Maximum size in bytes allowed for an uploaded file.
+# This setting will limit the maximum size of a single uploaded file.
+# Adjust this according to your needs.
+# For example, to allow a maximum file size of 100MB:
+# 100MB = 100 * 1024 * 1024 bytes
+# Note: This setting may not work with all web servers and configurations.
+# It's recommended to configure your web server (e.g., Nginx, Apache) to handle large file uploads.
+FILE_UPLOAD_MAX_SIZE = 100 * 1024 * 1024  # 100MB
