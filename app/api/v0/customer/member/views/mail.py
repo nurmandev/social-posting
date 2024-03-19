@@ -11,7 +11,7 @@ from django_mailbox.models import Message, Mailbox, MessageAttachment
 from ..serializers import *
 from db_schema.models import *
 from db_schema.serializers import *
-
+from datetime import datetime
 from ..tasks import send_email_task
 from validations.mail import *
 
@@ -132,6 +132,27 @@ class GetMailsByCustomer(APIView):
             return Response({"msg": str(e)}, status=500)
 
         
+class MakeMailAsRead(APIView):
+    permission_classes = [IsCustomer]
+    
+    def post(self, request, mail_id):
+        try:
+            m_mail = Mail.objects.filter(id=mail_id, manager=request.user).first()
+            if m_mail is None:
+                raise Exception("Mail not found")
+
+            with transaction.atomic():
+                if m_mail.read is None:
+                    m_mail.read = datetime.now()
+                    m_mail.save()
+                    
+            return Response({}, status=200)
+        
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": str(e)}, status=500)
+        
+
 class CreateAttachmentFileView(APIView):
     # permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]
     parser_classes = [MultiPartParser]
