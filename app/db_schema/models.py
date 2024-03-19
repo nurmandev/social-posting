@@ -1,4 +1,5 @@
 from django.db import models
+from django_mailbox.models import Message, Mailbox, MessageAttachment
 import json
 
 from jwt_auth.models import *
@@ -72,7 +73,7 @@ class CustomerMemo(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.memo
+        return self.content
     
     class Meta:
         verbose_name = "顧客メモ"
@@ -95,30 +96,19 @@ class MailTemplate(models.Model):
         verbose_name = "メールテンプレート"
         verbose_name_plural = "メールテンプレート管理"
     
-class AttachmentFile(models.Model):
-    file = models.FileField(upload_to='attachments/')
-    is_used = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.file.name
-
-    class Meta:
-        verbose_name = "添付ファイル"
-        verbose_name_plural = "添付ファイル管理"
 
 class Mail(models.Model):
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, blank=True, null=True)
-    manager = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    customers = models.ManyToManyField(Customer, blank=True)
+    managers = models.ManyToManyField(User, blank=True)
 
     # mail type is inbound or outbound
-    mail_type = models.CharField(max_length=50, blank=True, null=True)
+    outgoing = models.BooleanField(default=False)
+    read = models.DateTimeField(blank=True, null=True)
     
     subject = models.CharField(max_length=255, blank=True, null=True)
     body = models.TextField(blank=True, null=True)
 
-    attachments = models.ManyToManyField(AttachmentFile, blank=True)
+    attachments = models.ManyToManyField(MessageAttachment, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
