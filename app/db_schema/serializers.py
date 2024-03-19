@@ -43,10 +43,10 @@ class CustomerMemoSerializer(serializers.ModelSerializer):
 
 
 class MailTemplateSerializer(serializers.ModelSerializer):
-
+    publisher = UserSerializer(read_only=True)
     class Meta:
         model = MailTemplate
-        fields = ["id", "subject", "body"]
+        fields = ["id", "subject", "body", "publisher"]
 
 
 class AttachmentFileSerializer(serializers.ModelSerializer):

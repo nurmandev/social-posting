@@ -32,8 +32,10 @@ urlpatterns = [
     re_path(r'^mail_templates/(?P<mail_template_id>[0-9]+)$', UpdateMailTemplateAPI.as_view(), name='update_mail_template'),
 
     # Mail
-    re_path(r'^mails/$', GetMailsAPI.as_view(), name='get_mails'),
-    re_path(r'^mails/create$', CreateMailAPI.as_view(), name='create_mail'),
+    re_path(r'^mails/inbox$', GetInboxMailsAPI.as_view(), name='get_mails'),
+    re_path(r'^mails/sent$', GetInboxMailsAPI.as_view(), name='get_mails'),
+    re_path(r'^mails/new_send$', CreateMailAPI.as_view(), name='create_mail'),
+    re_path(r'^mails/group_send$', CreateGroupMailAPI.as_view(), name='create_mail'),
     re_path(r'^mails/attachment/upload$', CreateAttachmentFileView.as_view(), name='create_mail_attachment'),
     # re_path(r'^mails/(?P<mail_id>[0-9]+)$', UpdateMailAPI.as_view(), name='update_mail'),
 

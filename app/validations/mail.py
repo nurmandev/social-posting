@@ -39,3 +39,44 @@ def validate_create_mail(request):
         
         return {}, 500, {}
     
+
+def validate_create_group_mail(request):
+    data = dict(request.data)
+    group = int(data.get("group", 0))
+    group_type = data.get("group_type", "status")
+    subject = data.get("subject", "")
+    body = data.get("body", "")
+    attachment = data.get("attachment", [])
+    
+
+    try:
+        errors = {}
+        
+        if group_type == "status" and not Status.objects.filter(id=group).exists():
+            errors['group'] = "グループを選択します。"
+        
+        if group_type == "property" and not Property.objects.filter(id=group).exists():
+            errors['group'] = "グループを選択します。"
+
+        if subject == "":
+            errors["subject"] = "件名を入力してください"
+
+        if body == "":
+            errors["body"] = "本文を入力してください"
+
+        status = 422 if len(errors) > 0 else 200
+        clean_data = {
+            "group": group,
+            "group_type": group_type,
+            "subject": subject,
+            "body": body,
+            "attachment": attachment
+        }
+
+        return errors, status, clean_data
+        
+    except Exception as e:
+        print(str(e))
+        
+        return {}, 500, {}
+    
