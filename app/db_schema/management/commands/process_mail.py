@@ -13,23 +13,17 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         
-        m_box = Mailbox.objects.all().first()
+        m_boxes = Mailbox.objects.all()
         
-        if m_box:
+
+        for m_box in m_boxes:
             m_messages = m_box.get_new_mail()
 
             for message in m_messages:
-                if message.outgoing:
-                    m_customers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses))
-                else:
-                    m_customers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address))
-                
-                if message.outgoing:
-                    m_managers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses)).values_list('manager', flat=True)
-                    m_managers = User.objects.filter(id__in=m_managers)
-                else:
-                    m_managers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address)).values_list('manager', flat=True)
-                    m_managers = User.objects.filter(id__in=m_managers)
+                m_customers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address))
+            
+                m_managers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address)).values_list('manager', flat=True)
+                m_managers = User.objects.filter(Q(id__in=m_managers)|Q(user_info__role__role_id='admin'))
 
                 if m_customers.count() == 0 or m_managers.count() == 0:
                     continue
@@ -37,6 +31,7 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     
                     m_mail = Mail.objects.create(
+                        domain=m_box.name,
                         outgoing=False,
                         read=None,
                         subject=message.subject,

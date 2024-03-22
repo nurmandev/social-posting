@@ -10,6 +10,7 @@ def validate_create_mail(request):
     subject = data.get("subject", "")
     body = data.get("body", "")
     attachments = data.get("attachments", [])
+    domain = data.get("domain", "")
     
 
     try:
@@ -24,12 +25,16 @@ def validate_create_mail(request):
         if body == "":
             errors["body"] = "本文を入力してください"
 
+        if domain == "":
+            errors["domain"] = "ドメインを入力してください"
+
         status = 422 if len(errors) > 0 else 200
         clean_data = {
             "recipients": recipients,
             "subject": subject,
             "body": body,
-            "attachments": attachments
+            "attachments": attachments,
+            "domain": domain
         }
 
         return errors, status, clean_data
@@ -47,6 +52,7 @@ def validate_create_group_mail(request):
     subject = data.get("subject", "")
     body = data.get("body", "")
     attachments = data.get("attachments", [])
+    domain = data.get("domain", "")
     
 
     try:
@@ -64,13 +70,17 @@ def validate_create_group_mail(request):
         if body == "":
             errors["body"] = "本文を入力してください"
 
+        if domain == "":
+            errors["domain"] = "ドメインを入力してください"
+
         status = 422 if len(errors) > 0 else 200
         clean_data = {
             "group": group,
             "group_type": group_type,
             "subject": subject,
             "body": body,
-            "attachments": attachments
+            "attachments": attachments,
+            "domain": domain
         }
 
         return errors, status, clean_data
