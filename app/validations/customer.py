@@ -87,7 +87,9 @@ def validate_update_customer(request, customer_id):
     if role == "member":
         customer = customer.filter(manager=request.user)
     elif role == "admin":
-        customer = customer
+        pass
+    else:
+        raise Exception("Forbidden")
 
     customer = customer.first()
     
@@ -148,7 +150,9 @@ def validate_delete_customer(request, customer_id):
     if role == "member":
         customer = customer.filter(manager=request.user)
     elif role == "admin":
-        customer = customer
+        pass
+    else:
+        raise Exception("Forbidden")
 
     customer = customer.first()
     

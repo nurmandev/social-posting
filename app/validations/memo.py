@@ -1,12 +1,14 @@
 
 from django.db.models import *
 from db_schema.models import *
-import re
+
 
 
 def validate_memo(request):
     data = dict(request.data)
     content = data.get("content", "")
+
+
 
     try:
         errors = {}

@@ -15,7 +15,18 @@ class GetCustomerMemoAPI(APIView):
     
     def get(self, request, customer_id):
         try:
-            m_data = CustomerMemo.objects.filter(customer__id=customer_id, customer__manager=request.user).order_by("-created_at")
+            m_data = CustomerMemo.objects.filter(customer__id=customer_id)
+            
+            role = get_role(request.user)
+            if role == "member":
+                m_data = m_data.filter(customer__manager=request.user)
+            elif role == "admin":
+                pass
+            else:
+                raise Exception("Forbidden")
+            
+            m_data = m_data.order_by("-created_at")
+
             serializer = CustomerMemoSerializer(m_data, many=True)
 
             return Response({
@@ -38,8 +49,18 @@ class CreateCustomerMemoAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
+                m_customer = Customer.objects.filter(id=customer_id)
+
+                role = get_role(request.user)
+                if role == "member":
+                    m_customer = m_customer.filter(manager=request.user).first()
+                elif role == "admin":
+                    m_customer = m_customer.first()
+                else:
+                    raise Exception("Forbidden")
+
                 memo = CustomerMemo.objects.create(
-                    customer=Customer.objects.filter(id=customer_id).first(),
+                    customer=m_customer,
                     manager=request.user,
                     content=clean_data["content"]
                 )
@@ -65,7 +86,17 @@ class UpdateCustomerMemoAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
-                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id, customer__manager=request.user).first()
+                m_customer = Customer.objects.filter(id=customer_id)
+
+                role = get_role(request.user)
+                if role == "member":
+                    m_customer = m_customer.filter(manager=request.user).first()
+                elif role == "admin":
+                    m_customer = m_customer.first()
+                else:
+                    raise Exception("Forbidden")
+
+                memo = CustomerMemo.objects.filter(id=memo_id, customer=m_customer).first()
                 if memo is None:
                     raise Exception("メモが見つかりません。")
                 
@@ -85,7 +116,17 @@ class UpdateCustomerMemoAPI(APIView):
     def delete(self, request, customer_id, memo_id):
         try:
             with transaction.atomic():
-                memo = CustomerMemo.objects.filter(id=memo_id, customer_id=customer_id, customer__manager=request.user).first()
+                m_customer = Customer.objects.filter(id=customer_id)
+
+                role = get_role(request.user)
+                if role == "member":
+                    m_customer = m_customer.filter(manager=request.user).first()
+                elif role == "admin":
+                    m_customer = m_customer.first()
+                else:
+                    raise Exception("Forbidden")
+
+                memo = CustomerMemo.objects.filter(id=memo_id, customer=m_customer).first()
                 if memo is None:
                     raise Exception("メモが見つかりません。")
                 
