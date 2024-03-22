@@ -87,3 +87,11 @@ class IsCustomerAndMember(IsCustomer):
             return False
         
         
+
+def get_role(request):
+    try:
+        user = UserSerializer(request.user).data
+        return user['user_info']['role']['role_id']
+    except Exception as e:
+        print(str(e))
+        return None

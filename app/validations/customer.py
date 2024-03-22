@@ -1,7 +1,7 @@
 
 from django.db.models import *
 from db_schema.models import *
-import re
+from utils.permissions import get_role
 
 
 def validate_create_customer(request):
@@ -81,7 +81,19 @@ def validate_update_customer(request, customer_id):
     property = data.get("property", 0)
     system_provided = data.get("system_provided", False)
 
+    customer = Customer.objects.filter(id=customer_id)
 
+    role = get_role(request.user)
+    if role == "member":
+        customer = customer.filter(manager=request.user)
+    elif role == "admin":
+        customer = customer
+
+    customer = customer.first()
+    
+    if customer is None:
+        raise Exception("データが見つかりません。")
+    
     try:
         errors = {}
         
@@ -124,3 +136,40 @@ def validate_update_customer(request, customer_id):
         print(str(e))
         
         return {}, 500, {}
+    
+
+    
+def validate_delete_customer(request, customer_id):
+    data = dict(request.data)
+
+    customer = Customer.objects.filter(id=customer_id)
+
+    role = get_role(request.user)
+    if role == "member":
+        customer = customer.filter(manager=request.user)
+    elif role == "admin":
+        customer = customer
+
+    customer = customer.first()
+    
+    if customer is None:
+        raise Exception("データが見つかりません。")
+    
+    try:
+        errors = {}
+
+        clean_data = {
+
+        }
+
+        status = 422 if len(errors) > 0 else 200
+
+        return errors, status, clean_data
+        
+    except Exception as e:
+        print(str(e))
+        
+        return {}, 500, {}
+    
+
+    

@@ -24,8 +24,14 @@ class GetCustomersAPI(APIView):
         pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = Customer.objects.filter(Q(manager=request.user), Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
-            
+            m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
+
+            role = get_role(request.user)
+            if role == "member":
+                m_data = m_data.filter(manager=request.user)
+            elif role == "admin" and manager != 0:
+                m_data = m_data.filter(manager=User.objects.filter(id=manager).first())
+
             if Status.objects.filter(id=status).exists():
                 m_data = m_data.filter(status=Status.objects.filter(id=status).first())
 
@@ -179,7 +185,15 @@ class UpdateCustomerAPI(APIView):
 
     def get(self, request, customer_id):
         try:
-            customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
+            customer = Customer.objects.filter(id=customer_id)
+
+            role = get_role(request.user)
+            if role == "member":
+                customer = customer.filter(manager=request.user)
+            elif role == "admin":
+                customer = customer
+
+            customer = customer.first()
             
             if customer is None:
                 raise Exception("データが見つかりません。")
@@ -200,10 +214,7 @@ class UpdateCustomerAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
-                customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
-                
-                if customer is None:
-                    raise Exception("データが見つかりません。")
+                customer = Customer.objects.get(id=customer_id)
                 
                 customer.name = clean_data["last_name"] + " " + clean_data["first_name"]
                 customer.last_name = clean_data["last_name"]
@@ -231,11 +242,14 @@ class UpdateCustomerAPI(APIView):
     
     def delete(self, request, customer_id):
         try:
-            customer = Customer.objects.filter(id=customer_id, manager=request.user).first()
-            if customer is None:
-                raise Exception("データが見つかりません。")
+            errors, status, clean_data = validate_delete_customer(request, customer_id)
             
+            if status != 200:
+                return Response({"errors": errors}, status=status)
+            
+            customer = Customer.objects.get(id=customer_id)
             customer.delete()
+
             return Response({
                 "msg": "顧客情報が正常に削除されました。"
             })
