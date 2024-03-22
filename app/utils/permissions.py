@@ -88,9 +88,10 @@ class IsCustomerAndMember(IsCustomer):
         
         
 
-def get_role(request):
+def get_role(user):
     try:
-        return request.user.user_info.role.role_id
+        user = UserSerializer(user).data
+        return user['user_info']['role']['role_id']
     except Exception as e:
         print(str(e))
         return ""

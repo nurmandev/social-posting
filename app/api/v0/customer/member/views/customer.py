@@ -27,6 +27,7 @@ class GetCustomersAPI(APIView):
             m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
 
             role = get_role(request.user)
+            
             if role == "member":
                 m_data = m_data.filter(manager=request.user)
             elif role == "admin" and manager != 0:
