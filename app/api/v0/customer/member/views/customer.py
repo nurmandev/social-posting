@@ -28,13 +28,14 @@ class GetCustomersAPI(APIView):
 
             role = get_role(request.user)
             
-            if role == "member":
+            if role == "admin":
+                if manager != 0:
+                    m_data = m_data.filter(manager=User.objects.filter(id=manager).first())
+            elif role == "member":
                 m_data = m_data.filter(manager=request.user)
-            elif role == "admin" and manager != 0:
-                m_data = m_data.filter(manager=User.objects.filter(id=manager).first())
             else:
                 raise Exception("Forbidden")
-            
+                
             if Status.objects.filter(id=status).exists():
                 m_data = m_data.filter(status=Status.objects.filter(id=status).first())
 
