@@ -11,6 +11,7 @@ router = DefaultRouter()
 
 urlpatterns = [
     re_path(r'^data/role$', GetRoleAPI.as_view()),
+    re_path(r'^data/imap$', GetIMAPAPI.as_view()),
     re_path(r'^data/status$', GetStatusAPI.as_view()),
     re_path(r'^data/property$', GetPropertyAPI.as_view()),
     re_path(r'^attachments/upload$', CreateAttachmentFileView.as_view()),

@@ -5,6 +5,19 @@ import json
 from jwt_auth.models import *
 # Create your models here.
 
+class IMAP(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "IMAP"
+        verbose_name_plural = "IMAP管理"
+    
 class Property(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=50, blank=True, null=True)
@@ -97,9 +110,29 @@ class MailTemplate(models.Model):
     class Meta:
         verbose_name = "メールテンプレート"
         verbose_name_plural = "メールテンプレート管理"
+
+
+class MailDomain(models.Model):
+    mailbox = models.ForeignKey(Mailbox, on_delete=models.CASCADE, blank=True, null=True)
+    host = models.CharField(max_length=255, blank=True, null=True)
+    port = models.IntegerField(blank=True, null=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+    password = models.CharField(max_length=255, blank=True, null=True)
+    imap_host = models.CharField(max_length=255, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.username
     
+    class Meta:
+        verbose_name = "メールドメイン"
+        verbose_name_plural = "メールドメイン管理"
+
 
 class Mail(models.Model):
+    domain = models.EmailField(max_length=50, blank=True, null=True)
     customers = models.ManyToManyField(Customer, blank=True)
     managers = models.ManyToManyField(User, blank=True)
 

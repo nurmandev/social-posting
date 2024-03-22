@@ -25,6 +25,20 @@ class GetRoleAPI(APIView):
             return Response({"msg": "Internal Server Error"}, status=500)
 
 
+class GetIMAPAPI(APIView):
+    parser_classes = [MultiPartParser]
+    
+    def get(self, request):
+    
+        try:
+            m_data = IMAP.objects.all()
+            serializer = IMAPSerializer(m_data, many=True)
+
+            return Response(serializer.data, status=200)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": "Internal Server Error"}, status=500)
+
 
 class GetStatusAPI(APIView):
     parser_classes = [MultiPartParser]

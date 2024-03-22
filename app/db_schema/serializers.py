@@ -5,6 +5,14 @@ import re
 from .models import *
 from jwt_auth.serializers import *
 
+
+class IMAPSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = IMAP
+        fields = ['id', 'name']
+        
+
 class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -85,6 +93,12 @@ class MessageAttachmentSerializer(serializers.ModelSerializer):
             "name": name
         }
 
+
+class MailDomainSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MailDomain
+        fields = "__all__"
 
 
 class MailSerializer(serializers.ModelSerializer):

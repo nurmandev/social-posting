@@ -63,7 +63,7 @@ class CreateUserAPI(APIView):
                     is_allowed=clean_data['is_allowed']
                 )
 
-                # ※登録後、ユーザーにメールが送信されます。メール内のURLからアカウントの有効化を行ってください。
+                # ※登録後、担当にメールが送信されます。メール内のURLからアカウントの有効化を行ってください。
                 send_mail(request, clean_data["email"])
                 
                 serializer = UserSerializer(user)

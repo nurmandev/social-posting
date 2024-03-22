@@ -12,6 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.init_role()
+        self.init_imap()
         self.init_status()
         self.init_property()
 
@@ -24,6 +25,16 @@ class Command(BaseCommand):
                 with transaction.atomic():
                     role = Role.objects.create(**role)
                     role.save()
+
+    def init_imap(self):
+        
+        with open('db_schema/management/commands/data/imap.json', 'r', encoding="utf-8") as f:
+            data = json.load(f)
+
+            for imap in data:
+                with transaction.atomic():
+                    imap = IMAP.objects.create(**imap)
+                    imap.save()
 
     def init_status(self):
         

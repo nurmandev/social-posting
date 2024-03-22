@@ -3,7 +3,7 @@ from utils.permissions import *
 from django.db.models import *
 from django.db import transaction
 from django.template.loader import render_to_string
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, get_connection
 from django_mailbox.models import Message, Mailbox, MessageAttachment
 
 from db_schema.models import *

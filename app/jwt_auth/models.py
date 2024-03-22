@@ -36,8 +36,8 @@ class UserInfo(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "ユーザー情報"
-        verbose_name_plural = "ユーザー情報管理"
+        verbose_name = "担当情報"
+        verbose_name_plural = "担当情報管理"
 
 
 class User(AbstractUser):
@@ -66,8 +66,8 @@ class User(AbstractUser):
         return self.email
 
     class Meta:
-        verbose_name = "ユーザー"
-        verbose_name_plural = "ユーザー管理"
+        verbose_name = "担当"
+        verbose_name_plural = "担当管理"
 
 class RegisterToken(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
