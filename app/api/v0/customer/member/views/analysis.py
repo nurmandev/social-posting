@@ -27,6 +27,7 @@ class GetUserAnalysisAPI(APIView):
 
             for status in m_status:
                 res["analysis"].append({
+                    "id": status.id,
                     "name": status.name,
                     "count": m_data.filter(status=status).count()
                 })

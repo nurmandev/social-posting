@@ -17,6 +17,7 @@ class GetCustomersAPI(APIView):
     def get(self, request):
         keyword = request.GET.get('keyword', '')
         order_by = request.GET.get('order_by', 'id')
+        manager = int(request.GET.get('manager', 0))
         status = int(request.GET.get('status', 0))
         property = int(request.GET.get('property', 0))
         page = int(request.GET.get('page', 1))
