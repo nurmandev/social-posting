@@ -14,18 +14,24 @@ class IMAPSerializer(serializers.ModelSerializer):
         
 
 class PropertySerializer(serializers.ModelSerializer):
+    customer_cnt = serializers.SerializerMethodField()
 
     class Meta:
         model = Property
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'customer_cnt']
 
+    def get_customer_cnt(self, obj):
+        return Customer.objects.filter(property=obj).count()
 
 class StatusSerializer(serializers.ModelSerializer):
+    customer_cnt = serializers.SerializerMethodField()
 
     class Meta:
         model = Status
-        fields = ['id', 'name']
+        fields = ['id', 'name', 'customer_cnt']
 
+    def get_customer_cnt(self, obj):
+        return Customer.objects.filter(status=obj).count()
 
 class CustomerSerializer(serializers.ModelSerializer):
     property = PropertySerializer(read_only=True)
