@@ -14,6 +14,7 @@ urlpatterns = [
     re_path(r'^data/imap$', GetIMAPAPI.as_view()),
     re_path(r'^data/status$', GetStatusAPI.as_view()),
     re_path(r'^data/property$', GetPropertyAPI.as_view()),
+    re_path(r'^data/domain$', GetDomainAPI.as_view()),
     re_path(r'^attachments/upload$', CreateAttachmentFileView.as_view()),
     re_path(r'^attachments/(?P<id>[0-9]+)/download$', GetAttachmentFileView.as_view()),
 ]

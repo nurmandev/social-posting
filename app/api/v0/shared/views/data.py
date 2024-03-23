@@ -70,3 +70,22 @@ class GetPropertyAPI(APIView):
             print(str(e))
             return Response({"msg": "Internal Server Error"}, status=500)
 
+
+class GetDomainAPI(APIView):
+    parser_classes = [MultiPartParser]
+    
+    def get(self, request):
+    
+        try:
+            m_data = MailDomain.objects.all()
+
+            return Response([
+                {
+                    "id": data.id,
+                    "name": data.username
+                } for data in m_data
+            ], status=200)
+        except Exception as e:
+            print(str(e))
+            return Response({"msg": "Internal Server Error"}, status=500)
+
