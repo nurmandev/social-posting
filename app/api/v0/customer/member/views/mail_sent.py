@@ -25,7 +25,12 @@ class GetSentMailsAPI(APIView):
             pageSize = int(request.GET.get('pageSize', 20))
 
             # get incoming mails according to customers
-            m_mails = Mail.objects.filter(outgoing=True, domain=domain).order_by('-processed')
+            role = get_role(request.user)
+            m_mails = Mail.objects.filter(outgoing=True, domain=domain)
+            
+            m_mails = m_mails.filter(manager=request.user)
+            
+            m_mails = m_mails.order_by('-processed')
 
             serializer = MailSerializer(m_mails[(page-1)*pageSize : page*pageSize] , many=True)
 
