@@ -20,11 +20,12 @@ class GetSentMailsAPI(APIView):
 
     def get(self, request):
         try:
+            domain = request.GET.get('domain', "")
             page = int(request.GET.get('page', 1))
             pageSize = int(request.GET.get('pageSize', 20))
 
             # get incoming mails according to customers
-            m_mails = Mail.objects.filter(outgoing=True).order_by('-processed')
+            m_mails = Mail.objects.filter(outgoing=True, domain=domain).order_by('-processed')
 
             serializer = MailSerializer(m_mails[(page-1)*pageSize : page*pageSize] , many=True)
 
@@ -42,7 +43,13 @@ class GetSentMailAPI(APIView):
 
     def get(self, request, mail_id):
         try:
-            m_mail = Mail.objects.filter(id=mail_id, managers=request.user).first()
+            role = get_role(request.user)
+
+            m_mail = Mail.objects.filter(id=mail_id)
+            if role == "member":
+                m_mail = m_mail.filter(manager=request.user)
+
+            m_mail = m_mail.first()
             if m_mail is None:
                 raise Exception("Mail not found")
             
