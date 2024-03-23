@@ -61,7 +61,7 @@ class GetMailsByCustomer(APIView):
 
     def get(self, request, domain, customer_id):
         try:
-            m_customer = Customer.objects.filter(id=customer_id, domain=domain)
+            m_customer = Customer.objects.filter(id=customer_id)
 
             role = get_role(request.user)
             if role == "member":
@@ -71,7 +71,7 @@ class GetMailsByCustomer(APIView):
             if m_customer is None:
                 raise Exception("Customer not found")
             
-            m_mails = Mail.objects.filter(customers=m_customer).order_by('processed')
+            m_mails = Mail.objects.filter(customers=m_customer, domain=domain).order_by('processed')
             serializer = MailSerializer(m_mails, many=True)
 
             for mail in m_mails:
