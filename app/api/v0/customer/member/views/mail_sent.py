@@ -28,7 +28,7 @@ class GetSentMailsAPI(APIView):
             role = get_role(request.user)
             m_mails = Mail.objects.filter(outgoing=True, domain=domain)
             
-            m_mails = m_mails.filter(manager=request.user)
+            m_mails = m_mails.filter(managers=request.user)
             
             m_mails = m_mails.order_by('-processed')
 
