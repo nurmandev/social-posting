@@ -47,7 +47,7 @@ def send_email_task(request, recepients, clean_data):
     message = m_box.record_outgoing_message(email_obj.message())
 
     m_customers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses))
-    m_managers = [request.user]
+    m_managers = User.objects.filter(id=request.user.id)
 
     if m_customers.count() == 0 or m_managers.count() == 0:
         return
