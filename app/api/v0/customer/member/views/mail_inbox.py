@@ -21,21 +21,35 @@ class GetInboxMailsAPI(APIView):
 
     def get(self, request):
         try:
+            domain = request.GET.get('domain', "")
             page = int(request.GET.get('page', 1))
             pageSize = int(request.GET.get('pageSize', 20))
 
             # get incoming mails according to customers
-            m_customer_ids = Mail.objects.filter(outgoing=False).values_list('customers', flat=True)
+            m_customer_ids = Mail.objects.filter(domain=domain, outgoing=False).values_list('customers', flat=True)
 
-            m_customers = Customer.objects.filter(id__in=m_customer_ids).order_by('-last_contacted')
+            m_customers = Customer.objects.filter(id__in=m_customer_ids)
             
-            serializer = MailInboxSerializer(m_customers[(page-1)*pageSize : page*pageSize] , many=True)
+            role = get_role(request.user)
+            if role == "member":
+                m_customers = m_customers.filter(manager=request.user)
+            
+            m_customers = m_customers.order_by('-last_contacted')
+            
+            serializer = MailInboxSerializer(m_customers[(page-1)*pageSize : page*pageSize], context={"domain": domain} , many=True)
+
+            message_total = Mail.objects.filter(domain=domain)
+
+            if role == "member":
+                message_total = message_total.filter(customers__manager=request.user)
+
+            message_unread = message_total.filter(outgoing=False, read=None)
 
             return Response({
                 "data": serializer.data,
                 "total": m_customers.count(),
-                "message_unread": Mail.objects.filter(outgoing=False, read=None, managers=request.user).count(),
-                "message_total": Mail.objects.filter(managers=request.user).count()
+                "message_unread": message_unread.count(),
+                "message_total": message_total.count()
             }, status=200)
         except Exception as e:
             print(str(e))

@@ -120,7 +120,8 @@ class MailInboxSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def get_last_message(self, obj):
-        m_messages = Mail.objects.filter(customers__id=obj.id).order_by('-processed')
+        domain = self.context.get("domain", "")
+        m_messages = Mail.objects.filter(customers__id=obj.id, domain=domain).order_by('-processed')
         if m_messages.exists():
             
             m_message = m_messages.first()
@@ -129,9 +130,11 @@ class MailInboxSerializer(serializers.ModelSerializer):
         return None
     
     def get_message_cnt(self, obj):
-        m_messages = Mail.objects.filter(customers__id=obj.id)
+        domain = self.context.get("domain", "")
+        m_messages = Mail.objects.filter(customers__id=obj.id, domain=domain)
         return m_messages.count()
 
     def get_new_message_cnt(self, obj):
-        m_messages = Mail.objects.filter(customers__id=obj.id, outgoing=False, read=None)
+        domain = self.context.get("domain", "")
+        m_messages = Mail.objects.filter(customers__id=obj.id, outgoing=False, read=None, domain=domain)
         return m_messages.count()
