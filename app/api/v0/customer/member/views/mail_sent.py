@@ -52,7 +52,7 @@ class GetSentMailAPI(APIView):
 
             m_mail = Mail.objects.filter(id=mail_id)
             if role == "member":
-                m_mail = m_mail.filter(manager=request.user)
+                m_mail = m_mail.filter(managers=request.user)
 
             m_mail = m_mail.first()
             if m_mail is None:
