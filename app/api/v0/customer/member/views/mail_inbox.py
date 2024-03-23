@@ -59,10 +59,15 @@ class GetInboxMailsAPI(APIView):
 class GetMailsByCustomer(APIView):
     permission_classes = [IsCustomerAndMember|IsCustomerAndAdmin]
 
-    def get(self, request, customer_id):
+    def get(self, request, domain, customer_id):
         try:
-            m_customer = Customer.objects.get(id=customer_id, manager=request.user)
-            
+            m_customer = Customer.objects.filter(id=customer_id, domain=domain)
+
+            role = get_role(request.user)
+            if role == "member":
+                m_customer = m_customer.filter(manager=request.user)
+                
+            m_customer = m_customer.first()
             if m_customer is None:
                 raise Exception("Customer not found")
             
