@@ -31,6 +31,7 @@ def send_email_task(request, recepients, clean_data):
     if m_domain is None:
         raise Exception("ドメインが無効です。")
     
+    email_obj.from_email = m_domain.username
     email_obj.connection = get_connection(
         host=m_domain.host,
         port=m_domain.port,
