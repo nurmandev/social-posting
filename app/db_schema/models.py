@@ -20,13 +20,22 @@ class IMAP(models.Model):
     
 class Property(models.Model):
     name = models.CharField(max_length=50, unique=True)
-    description = models.CharField(max_length=50, blank=True, null=True)
+    
+    PROPERTY_CHOICES = (
+        ('A', 'A'),
+        ('B', 'B'),
+        ('C', 'C'),
+        ('D', 'D'),
+        ('E', 'E'),
+    )
+
+    property_type = models.CharField(max_length=50, blank=True, null=True, choices=PROPERTY_CHOICES)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.property_type if self.property_type is not None else ''}"
     
     class Meta:
         verbose_name = "属性"
@@ -36,11 +45,25 @@ class Property(models.Model):
 class Status(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
+    STATUS_CHOICES = (
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+        ('6', '6'),
+        ('7', '7'),
+        ('8', '8'),
+        ('9', '9'),
+    )
+
+    status_type = models.CharField(max_length=50, blank=True, null=True, choices=STATUS_CHOICES)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.name} - {self.status_type if self.status_type is not None else ''}"
     
     class Meta:
         verbose_name = "ステータス"

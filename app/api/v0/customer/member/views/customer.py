@@ -122,7 +122,12 @@ class CreateMultiCustomerAPI(APIView):
                 ads = customer.get('ads', '')
                 deposit_date = customer.get('deposit_date', None)
                 contract_start_date = customer.get('contract_start_date', None)
-                contract_days = int(customer.get('contract_days', 0))
+
+                try:
+                    contract_days = int(customer.get('contract_days', 0))
+                except:
+                    contract_days = 0
+                    
                 status = customer.get('status', '')
                 property = customer.get('property', '')
                 system_provided = customer.get('system_provided', False)
@@ -147,8 +152,8 @@ class CreateMultiCustomerAPI(APIView):
                             deposit_date = deposit_date,
                             contract_start_date = contract_start_date,
                             contract_days = contract_days,
-                            status = Status.objects.filter(name=status).first(),
-                            property = Property.objects.filter(name=property).first(),
+                            status = Status.objects.filter(Q(name=status)|Q(status_type=status)).first(),
+                            property = Property.objects.filter(Q(name=property)|Q(property_type=property)).first(),
                             system_provided = True if system_provided == "OK" else False,
                             manager = request.user
                         )
