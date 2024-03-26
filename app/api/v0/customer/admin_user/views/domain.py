@@ -86,7 +86,9 @@ class CreateDomainAPI(APIView):
                 
             except Exception as e:
                 print(str(e))
-                return Response("メール設定にエラーがあります。", status=400)
+                return Response({
+                    "msg": "メール設定にエラーがあります。"
+                }, status=400)
 
         except Exception as e:
             print(str(e))
@@ -156,7 +158,9 @@ class UpdateDomainAPI(APIView):
                 
             except Exception as e:
                 print(str(e))
-                return Response("メール設定にエラーがあります。", status=400)
+                return Response({
+                    "msg": "メール設定にエラーがあります。"
+                }, status=400)
 
 
         except Exception as e:
