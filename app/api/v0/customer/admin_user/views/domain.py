@@ -48,7 +48,7 @@ class CreateDomainAPI(APIView):
                     
                     m_box = Mailbox.objects.create(
                         name = clean_data["username"],
-                        uri = f"imap+ssl://{clean_data['username'].replace('@', '%40')}:{clean_data['password']}@{clean_data['imap_host']}?archive=受信",
+                        uri = f"imap+ssl://{clean_data['username'].replace('@', '%40')}:{clean_data['password']}@{clean_data['imap_host']}?archive=NEW",
                         from_email = clean_data["username"],
                         active = True
                     )
@@ -122,7 +122,7 @@ class UpdateDomainAPI(APIView):
                     m_domain = MailDomain.objects.get(id=domain_id)
                     m_box = m_domain.mailbox
 
-                    m_box.uri = f"imap+ssl://{clean_data['username'].replace('@', '%40')}:{clean_data['password']}@{clean_data['imap_host']}?archive=受信"
+                    m_box.uri = f"imap+ssl://{clean_data['username'].replace('@', '%40')}:{clean_data['password']}@{clean_data['imap_host']}?archive=NEW"
                     m_box.name = clean_data["username"]
                     m_box.from_email = clean_data["username"]
                     m_box.save()
