@@ -15,9 +15,11 @@ def send_email_task(request, recepients, clean_data):
     recepient_users = Customer.objects.filter(id__in=recepients)
     
     mail_subject = clean_data["subject"]
-
+    message = render_to_string("mail_template/customer_mail.html", {
+        "content": clean_data["body"],
+    })
     email_obj = EmailMessage(
-        mail_subject, clean_data['body'], to=[recepient_user.email for recepient_user in recepient_users]
+        mail_subject, message, to=[recepient_user.email for recepient_user in recepient_users]
     )
     email_obj.content_subtype = "html"
 
