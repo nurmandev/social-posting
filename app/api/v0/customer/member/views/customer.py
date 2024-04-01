@@ -95,7 +95,7 @@ class CreateCustomerAPI(APIView):
         
 
 
-class CreateMultiCustomerAPI(APIView):
+class CreateBatchCustomerAPI(APIView):
     permission_classes = [IsCustomer]
     
     def post(self, request):
@@ -130,7 +130,15 @@ class CreateMultiCustomerAPI(APIView):
                     
                 status = customer.get('status', '')
                 property = customer.get('property', '')
-                system_provided = customer.get('system_provided', False)
+                system_provided = customer.get('system_provided', "NG")
+
+                role = get_role(request.user)
+                if role == "member":
+                    manager= request.user
+                elif role == "admin":
+                    manager = User.objects.filter(user_info__name=customer.get('manager', '')).first()
+                    if manager is None:
+                        manager = request.user
                 
                 try:
                     
@@ -152,33 +160,20 @@ class CreateMultiCustomerAPI(APIView):
                             deposit_date = deposit_date,
                             contract_start_date = contract_start_date,
                             contract_days = contract_days,
-                            status = Status.objects.filter(Q(name=status)|Q(status_type=status)).first(),
-                            property = Property.objects.filter(Q(name=property)|Q(property_type=property)).first(),
+                            status = Status.objects.filter(status_type=status).first(),
+                            property = Property.objects.filter(property_type=property).first(),
                             system_provided = True if system_provided == "OK" else False,
-                            manager = request.user
+                            manager = manager
                         )
 
                         res.append({
-                            "data": CustomerSerializer(m_customer).data,
+                            "data": customer.data,
                             "status": 200
                         })
                 except Exception as e:
                     print(str(e))
                     res.append({
-                        "data": {
-                            "name": name,
-                            "email": email,
-                            "phone": phone,
-                            "email_2": email_2,
-                            "phone_2": phone_2,
-                            "ads": ads,
-                            "deposit_date": deposit_date,
-                            "contract_start_date": contract_start_date,
-                            "contract_days": contract_days,
-                            "status": status,
-                            "property": property,
-                            "system_provided": system_provided
-                        },
+                        "data": customer,
                         "status": 400
                     })
 

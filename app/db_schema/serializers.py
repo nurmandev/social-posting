@@ -18,7 +18,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Property
-        fields = ['id', 'name', 'customer_cnt']
+        fields = ['id', 'name', 'property_type', 'customer_cnt']
 
     def get_customer_cnt(self, obj):
         return Customer.objects.filter(property=obj).count()
@@ -28,7 +28,7 @@ class StatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Status
-        fields = ['id', 'name', 'customer_cnt']
+        fields = ['id', 'name', 'status_type', 'customer_cnt']
 
     def get_customer_cnt(self, obj):
         return Customer.objects.filter(status=obj).count()
@@ -36,7 +36,7 @@ class StatusSerializer(serializers.ModelSerializer):
 class CustomerSerializer(serializers.ModelSerializer):
     property = PropertySerializer(read_only=True)
     status = StatusSerializer(read_only=True)
-    manager = UserSerializer(read_only=True)
+    manager = UserNameSerializer(read_only=True)
 
     class Meta:
         model = Customer
@@ -49,7 +49,7 @@ class CustomerNameSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "email"]
 
 class CustomerFlatSerializer(serializers.ModelSerializer):
-    manager = UserSerializer(read_only=True)
+    manager = UserNameSerializer(read_only=True)
 
     class Meta:
         model = Customer
@@ -57,7 +57,7 @@ class CustomerFlatSerializer(serializers.ModelSerializer):
 
 
 class CustomerMemoSerializer(serializers.ModelSerializer):
-    manager = UserSerializer(read_only=True)
+    manager = UserNameSerializer(read_only=True)
 
     class Meta:
         model = CustomerMemo
@@ -65,7 +65,7 @@ class CustomerMemoSerializer(serializers.ModelSerializer):
 
 
 class MailTemplateSerializer(serializers.ModelSerializer):
-    publisher = UserSerializer(read_only=True)
+    publisher = UserNameSerializer(read_only=True)
     class Meta:
         model = MailTemplate
         fields = ["id", "subject", "body", "publisher"]
