@@ -22,7 +22,7 @@ class Command(BaseCommand):
             for message in m_messages:
                 m_customers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address))
             
-                m_managers = Customer.objects.filter(Q(email__in=message.from_address) | Q(email_2__in=message.from_address)).values_list('manager', flat=True)
+                m_managers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses)).values_list('manager', flat=True)
                 m_managers = User.objects.filter(Q(id__in=m_managers)|Q(user_info__role__role_id='admin'))
 
                 if m_customers.count() == 0 or m_managers.count() == 0:
