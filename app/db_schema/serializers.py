@@ -6,13 +6,6 @@ from .models import *
 from jwt_auth.serializers import *
 
 
-class IMAPSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = IMAP
-        fields = ['id', 'name']
-        
-
 class PropertySerializer(serializers.ModelSerializer):
     customer_cnt = serializers.SerializerMethodField()
 

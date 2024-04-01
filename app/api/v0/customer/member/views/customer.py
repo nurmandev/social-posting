@@ -1,5 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from django.http import FileResponse
 from django.db.models import *
 from django.db import transaction
 from django.contrib.auth.hashers import check_password, make_password
@@ -106,8 +107,6 @@ class CreateBatchCustomerAPI(APIView):
             customers = data.get('data', [])
 
             for customer in customers:
-                customer = dict(customer)
-                
                 name = customer.get('name', '')
                 if len(name.split(' ')) == 2:
                     last_name = name.split(' ')[0]
@@ -167,7 +166,7 @@ class CreateBatchCustomerAPI(APIView):
                         )
 
                         res.append({
-                            "data": customer.data,
+                            "data": customer,
                             "status": 200
                         })
                 except Exception as e:
@@ -262,3 +261,85 @@ class UpdateCustomerAPI(APIView):
         except Exception as e:
             print(str(e))
             return Response({"msg": "Internal Server Error"}, status=400)
+        
+
+class DownloadCustomerAPI(APIView):
+    permission_classes = [IsCustomer]
+    
+    def get(self, request):
+        try:
+            customers = Customer.objects.all()
+
+            role = get_role(request.user)
+            if role == "member":
+                customers = customers.filter(manager=request.user)
+            
+            import os
+            import xlsxwriter
+            from uuid import uuid4
+            import datetime
+            
+            if not os.path.exists(f"storage/customers"):
+                os.makedirs(f"storage/customers")
+
+            path = f"storage/customers/{uuid4()}.xlsx"
+
+            workbook = xlsxwriter.Workbook(path)
+            worksheet = workbook.add_worksheet()
+
+            font_format = workbook.add_format({'font_name': 'Yu Mincho'})
+            row = 0
+            worksheet.write(row, 0, "広告媒体", font_format)
+            worksheet.write(row, 1, "氏名", font_format)
+            worksheet.write(row, 2, "メールアドレス", font_format)
+            worksheet.write(row, 3, "電話番号", font_format)
+            worksheet.write(row, 4, "メールアドレス2", font_format)
+            worksheet.write(row, 5, "電話番号2", font_format)
+            if role == "admin":
+                worksheet.write(row, 6, "担当者", font_format)
+                worksheet.write(row, 7, "入金日", font_format)
+                worksheet.write(row, 8, "契約開始日", font_format)
+                worksheet.write(row, 9, "契約日数", font_format)
+                worksheet.write(row, 10, "属性", font_format)
+                worksheet.write(row, 11, "ステータス", font_format)
+                worksheet.write(row, 12, "システム提供", font_format)
+            else:
+                worksheet.write(row, 6, "入金日", font_format)
+                worksheet.write(row, 7, "契約開始日", font_format)
+                worksheet.write(row, 8, "契約日数", font_format)
+                worksheet.write(row, 9, "属性", font_format)
+                worksheet.write(row, 10, "ステータス", font_format)
+                worksheet.write(row, 11, "システム提供", font_format)
+
+            row += 1
+
+            for customer in customers:
+                worksheet.write(row, 0, customer.ads, font_format)
+                worksheet.write(row, 1, customer.name, font_format)
+                worksheet.write(row, 2, customer.email, font_format)
+                worksheet.write(row, 3, customer.phone, font_format)
+                worksheet.write(row, 4, customer.email_2, font_format)
+                worksheet.write(row, 5, customer.phone_2, font_format)
+                if role == "admin":
+                    worksheet.write(row, 6, customer.manager.user_info.name, font_format)
+                    worksheet.write(row, 7, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
+                    worksheet.write(row, 8, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
+                    worksheet.write(row, 9, customer.contract_days, font_format)
+                    worksheet.write(row, 10, customer.property.property_type if customer.property else "", font_format)
+                    worksheet.write(row, 11, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 12, "OK" if customer.system_provided else "NG", font_format)
+                else:
+                    worksheet.write(row, 6, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
+                    worksheet.write(row, 7, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
+                    worksheet.write(row, 8, customer.contract_days, font_format)
+                    worksheet.write(row, 9, customer.property.property_type if customer.property else "", font_format)
+                    worksheet.write(row, 10, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 11, "OK" if customer.system_provided else "NG", font_format)
+                
+                row += 1
+            workbook.close()
+
+            return FileResponse(open(path, 'rb'), status=200)
+        except Exception as e:
+            print(str(e))
+            return Response("Internal Server Error", status=500)

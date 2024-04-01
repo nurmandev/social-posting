@@ -5,19 +5,6 @@ import json
 from jwt_auth.models import *
 # Create your models here.
 
-class IMAP(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.name
-    
-    class Meta:
-        verbose_name = "IMAP"
-        verbose_name_plural = "IMAP管理"
-    
 class Property(models.Model):
     name = models.CharField(max_length=50, unique=True)
     
