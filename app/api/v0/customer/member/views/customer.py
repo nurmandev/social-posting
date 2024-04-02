@@ -131,15 +131,14 @@ class CreateBatchCustomerAPI(APIView):
                 property = customer.get('property', '')
                 system_provided = customer.get('system_provided', "NG")
 
-                role = get_role(request.user)
-                if role == "member":
-                    manager= request.user
-                elif role == "admin":
-                    manager = User.objects.filter(user_info__name=customer.get('manager', '')).first()
-                    if manager is None:
-                        manager = request.user
-                
                 try:
+                    role = get_role(request.user)
+                    if role == "member":
+                        manager= request.user
+                    elif role == "admin":
+                        manager = User.objects.filter(user_info__name=customer.get('manager', '')).first()
+                        if manager is None:
+                            raise Exception("Invalid Data")
                     
                     if name == "" or email == "" or phone == "" or Customer.objects.filter(email=email).exists():
                         raise Exception("Invalid Data")
