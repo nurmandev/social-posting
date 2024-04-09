@@ -5,7 +5,6 @@ www/node_modules
 www/.next
 media/attachments/
 dev/
-backend.json
 
 
 # Byte-compiled / optimized / DLL files
@@ -137,6 +136,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+backend.json
 
 # Spyder project settings
 .spyderproject
