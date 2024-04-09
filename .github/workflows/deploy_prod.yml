@@ -1,14 +1,14 @@
 name: Deploy to Server
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - master
+      - '*'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/production'
 
     steps:
     - name: Checkout code
@@ -22,5 +22,6 @@ jobs:
         key: ${{ secrets.SERVER_SSH_KEY }}
         port: ${{ secrets.SERVER_PORT }}
         script: |
-          cd /var/www/server/cms-backend/
-          git pull origin master
+          cd /var/www/server/cms_tokyo_stock_news-prod/app
+          git pull origin production
+          python3 manage.py migrate
