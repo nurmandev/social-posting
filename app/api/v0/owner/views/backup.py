@@ -57,7 +57,7 @@ class GetBackupListAPI(APIView):
             })
         
 
-class BackupAPI(APIView):
+class BackupLoadAPI(APIView):
     permission_classes = [IsOwner|IsSuper]
 
     def post(self, request):
@@ -78,14 +78,43 @@ class BackupAPI(APIView):
             management.call_command(f"dbbackup", f"-otemp_cms_wavemaster_db_backup_{today}.sql")
             management.call_command(f"mediabackup", f"-otemp_cms_wavemaster_media_backup_{today}.tar")
 
+            management.call_command(f"dbrestore", f"-icms_wavemaster_db_backup_{time}.sql", "--noinput")
+            management.call_command(f"mediarestore", f"-icms_wavemaster_media_backup_{time}.tar", "--noinput")
 
-            management.call_command(f"dbrestore", f"-i{os.path.join(base_dir, f'cms_wavemaster_db_backup_{time}.sql')} --noinput")
-            management.call_command(f"mediarestore", f"-i{os.path.join(base_dir, f'cms_wavemaster_media_backup_{time}.tar')} --noinput")
-
-            return Response("バックアップが完了しました")
+            return Response({
+                "msg": "バックアップが完了しました"
+            })
         except Exception as e:
             print(str(e))
-            return Response("バックアップに失敗しました", status=500)
+            return Response({
+                "msg": str(e)
+            }, status=400)
+
+class BackupCreateAPI(APIView):
+    permission_classes = [IsOwner|IsSuper]
+
+    def post(self, request):
+        data = dict(request.data)
+        time = data.get('time', '')
+
+        try:
+            from django.core import management
+            from datetime import datetime
+
+            today = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+            management.call_command(f"dbbackup", f"-ocms_wavemaster_db_backup_{today}.sql")
+            management.call_command(f"mediabackup", f"-ocms_wavemaster_media_backup_{today}.tar")
+
+
+            return Response({
+                "msg": "設定されました"
+            })
+        except Exception as e:
+            print(str(e))
+            return Response({
+                "msg": str(e)
+            }, status=400)
 
 
 class DownloadBackupAPI(APIView):

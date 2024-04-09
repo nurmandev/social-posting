@@ -10,5 +10,6 @@ router = DefaultRouter()
 urlpatterns = [
     re_path(r'^backup/list$', GetBackupListAPI.as_view()),
     re_path(r'^backup/download$', DownloadBackupAPI.as_view()),
-    re_path(r'^backup$', BackupAPI.as_view()),
+    re_path(r'^backup/load$', BackupLoadAPI.as_view()),
+    re_path(r'^backup/create$', BackupCreateAPI.as_view()),
 ]
