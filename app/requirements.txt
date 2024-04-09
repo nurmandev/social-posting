@@ -15,6 +15,4 @@ django-crontab
 django-mailbox
 docxtpl
 XlsxWriter
-celery
-redis
 django-dbbackup
