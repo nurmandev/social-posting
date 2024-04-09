@@ -1,14 +1,14 @@
 name: Deploy to Server
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
-      - staging
+      - '*'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/staging'
 
     steps:
     - name: Checkout code
@@ -24,4 +24,5 @@ jobs:
         script: |
           cd /var/www/server/cms_tokyo_stock_news-stg/app
           git pull origin staging
+          source /var/www/server/cms_tokyo_stock_news-stg/venv/bin/activate
           python3 manage.py migrate
