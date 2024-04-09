@@ -26,6 +26,10 @@ class GetBackupListAPI(APIView):
 
             backup_dir = os.path.join(settings.BASE_DIR, 'backup')
             backup_files = os.listdir(backup_dir)
+            
+            # order by name
+            backup_files = sorted(backup_files, reverse=True)
+            
 
             result = []
 
@@ -91,21 +95,19 @@ class DownloadBackupAPI(APIView):
         time = request.GET.get('time', '')
         backup_type = request.GET.get('type', '')
 
-        if backup_type not in ['db', 'media']:
-            raise Exception("Invalid backup type")
-
-        if backup_type == 'db':
-            backup_file = f"cms_wavemaster_db_backup_{time}.sql"
-        else:
-            backup_file = f"cms_wavemaster_media_backup_{time}.tar"
-
         try:
-            import os
+            print(backup_type)
+            if backup_type not in ['db', 'media']:
+                raise Exception("Invalid backup type")
 
-            with open(os.path.join(settings.BASE_DIR, 'backup', backup_file), 'rb') as f:
-                response = FileResponse(f)
-                response['Content-Disposition'] = f'attachment; filename="{backup_file}"'
-                return response
+            if backup_type == 'db':
+                backup_file = f"cms_wavemaster_db_backup_{time}.sql"
+            else:
+                backup_file = f"cms_wavemaster_media_backup_{time}.tar"
+
+            import os
+            
+            return FileResponse(open(os.path.join(settings.BASE_DIR, 'backup', backup_file), 'rb'))
         except Exception as e:
             print(str(e))
             return Response("バックアップファイルが見つかりません", status=404)
