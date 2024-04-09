@@ -7,10 +7,11 @@ from utils.permissions import *
 from django.db.models import *
 from django.db import transaction
 
+from mail.mailbox import send_email_task
 from django_mailbox.models import Message, Mailbox, MessageAttachment
+
 from db_schema.models import *
 from db_schema.serializers import *
-from ..tasks import send_email_task
 from validations.mail import *
 
 class CreateMailAPI(APIView):

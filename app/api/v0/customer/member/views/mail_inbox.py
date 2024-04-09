@@ -2,17 +2,14 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser
 from utils.permissions import *
 from django.db.models import *
 from django.db import transaction
 
-from django_mailbox.models import Message, Mailbox, MessageAttachment
 from ..serializers import *
 from db_schema.models import *
 from db_schema.serializers import *
 from datetime import datetime
-from ..tasks import send_email_task
 from validations.mail import *
 
 

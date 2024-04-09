@@ -152,10 +152,7 @@ else:
             'HOST': 'localhost'
         }
     }
-# Celery Configuration
-CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL of your message broker (Redis in this case)
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # URL of your result backend (Redis in this case)
-
+    
 DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': f'{BASE_DIR}/backup/' }
 
