@@ -12,7 +12,7 @@ from db_schema.serializers import *
 
 
 class GetBackupListAPI(APIView):
-    permission_classes = [IsOwner, IsSuper]
+    permission_classes = [IsOwner|IsSuper]
 
     def get(self, request):
         keyword = request.GET.get('keyword', '')
@@ -54,7 +54,7 @@ class GetBackupListAPI(APIView):
         
 
 class BackupAPI(APIView):
-    permission_classes = [IsOwner, IsSuper]
+    permission_classes = [IsOwner|IsSuper]
 
     def post(self, request):
         data = dict(request.data)
@@ -85,7 +85,7 @@ class BackupAPI(APIView):
 
 
 class DownloadBackupAPI(APIView):
-    permission_classes = [IsOwner, IsSuper]
+    permission_classes = [IsOwner|IsSuper]
 
     def get(self, request):
         time = request.GET.get('time', '')
