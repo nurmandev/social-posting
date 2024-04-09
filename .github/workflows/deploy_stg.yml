@@ -24,5 +24,4 @@ jobs:
         script: |
           cd /var/www/server/cms_tokyo_stock_news-stg/app
           git pull origin staging
-          source .venv/bin/activate
           python3 manage.py migrate
