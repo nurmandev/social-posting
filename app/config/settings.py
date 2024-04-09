@@ -21,18 +21,19 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 ON_SERVER = env("ON_SERVER", default=True)
+PRODUCTION_MODE = env("PRODUCTION_MODE", default="production")
 
 if ON_SERVER:
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "wavemaster.vercel.app", "162.43.49.87"]
+    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "cms_wavemaster.vercel.app", "162.43.49.87"]
     CORS_ALLOWED_ORIGINS = [
-        "https://wavemaster.vercel.app",
+        "https://cms_wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
     ]
     CSRF_TRUSTED_ORIGINS = [
-        "https://wavemaster.vercel.app",
+        "https://cms_wavemaster.vercel.app",
         "https://x162-43-49-87.static.xvps.ne.jp"
     ]
 else:
@@ -185,11 +186,18 @@ STORAGE_ROOT = os.path.join(BASE_DIR, 'storage')
 
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+
+if PRODUCTION_MODE == "staging":
+    MEDIA_URL = '/staging/media/'
+else:
+    MEDIA_URL = '/media/'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-STATIC_URL = "/static/"
+if PRODUCTION_MODE == "staging":
+    STATIC_URL = '/staging/static/'
+else:
+    STATIC_URL = '/static/'
 
 DJANGO_CSS_INLINE_ENABLE = True
 
