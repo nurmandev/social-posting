@@ -58,7 +58,8 @@ THIRD_PARTY_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework_swagger',       # Swagger 
     'drf_yasg',                     # Yet Another Swagger generator
-    'django_crontab'
+    'django_crontab',
+    'dbbackup'
 ]
 OUR_APPS = [
     "jwt_auth",
@@ -126,6 +127,13 @@ if ON_SERVER:
             'PORT':'3306',
         }
     }
+    DBBACKUP_CONNECTORS = {
+        'default': {
+            'USER': env("DB_USER"),
+            'PASSWORD': env("DB_PASSWORD"),
+            'HOST': 'localhost'
+        }
+    }
 else:
     DATABASES = {
         'default': {
@@ -137,11 +145,19 @@ else:
             'PORT':'3306',
         }
     }
-
+    DBBACKUP_CONNECTORS = {
+        'default': {
+            'USER': 'root',
+            'PASSWORD': '',
+            'HOST': 'localhost'
+        }
+    }
 # Celery Configuration
 CELERY_BROKER_URL = 'redis://localhost:6379/0'  # URL of your message broker (Redis in this case)
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'  # URL of your result backend (Redis in this case)
 
+DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
+DBBACKUP_STORAGE_OPTIONS = {'location': f'{BASE_DIR}/backup/' }
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
