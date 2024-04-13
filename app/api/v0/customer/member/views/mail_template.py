@@ -18,7 +18,7 @@ class GetMailTemplatesAPI(APIView):
         pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = MailTemplate.objects.filter(Q(subject__contains=keyword) | Q(body__contains=keyword), Q(publisher=request.user)).order_by('id')
+            m_data = MailTemplate.objects.filter(Q(subject__contains=keyword) | Q(body__contains=keyword)).order_by('id')
             serializer = MailTemplateSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
 
             return Response({
@@ -62,7 +62,7 @@ class UpdateMailTemplateAPI(APIView):
 
     def get(self, request, mail_template_id):
         try:
-            mail_template = MailTemplate.objects.filter(id=mail_template_id, publisher=request.user).first()
+            mail_template = MailTemplate.objects.filter(id=mail_template_id).first()
             
             if mail_template is None:
                 raise Exception("メールテンプレートが見つかりません")
@@ -82,13 +82,10 @@ class UpdateMailTemplateAPI(APIView):
                 return Response({"errors": errors}, status=status)
             
             with transaction.atomic():
-                mail_template = MailTemplate.objects.filter(id=mail_template_id, publisher=request.user).first()
+                mail_template = MailTemplate.objects.filter(id=mail_template_id).first()
                 
                 if mail_template is None:
                     raise Exception("メールテンプレートが見つかりません")
-                
-                if mail_template.publisher != request.user:
-                    return Response({"msg": "権限がありません"}, status=403)
 
                 mail_template.subject = clean_data["subject"]
                 mail_template.body = clean_data["body"]
@@ -105,13 +102,10 @@ class UpdateMailTemplateAPI(APIView):
         
     def delete(self, request, mail_template_id):
         try:
-            mail_template = MailTemplate.objects.filter(id=mail_template_id, publisher=request.user).first()
+            mail_template = MailTemplate.objects.filter(id=mail_template_id).first()
             
             if mail_template is None:
                 raise Exception("メールテンプレートが見つかりません")
-            
-            if mail_template.publisher != request.user:
-                return Response({"msg": "権限がありません"}, status=403)
             
             mail_template.delete()
             return Response("OK", status=200)
