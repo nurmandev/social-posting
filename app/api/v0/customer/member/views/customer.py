@@ -158,8 +158,8 @@ class CreateBatchCustomerAPI(APIView):
                             deposit_date = deposit_date,
                             contract_start_date = contract_start_date,
                             contract_days = contract_days,
-                            status = Status.objects.filter(status_type=status).first(),
-                            property = Property.objects.filter(property_type=property).first(),
+                            status = Status.objects.filter(Q(status_type=status)|Q(name=status)).first(),
+                            property = Property.objects.filter(Q(property_type=property)|Q(name=property)).first(),
                             system_provided = True if system_provided == "OK" else False,
                             manager = manager
                         )
