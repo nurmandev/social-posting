@@ -12,12 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            user_info = UserInfo.objects.create(name='Akira', last_name='Murayama', first_name='Akira', name_furi='ムラヤマ', last_name_furi='ムラヤマ', first_name_furi='アキラ', phone='080-1234-5678')
+            user_info = UserInfo.objects.create(name='村山　晃', last_name='村山', first_name='晃', name_furi='むらやま　あきら', last_name_furi='むらやま', first_name_furi='あきら', phone='080-1234-5678')
             m_user = User.objects.create(user_info=user_info, email='akira.murayama.dev@gmail.com', password=make_password('password'), permission='super', is_active=True, is_superuser=True, is_staff=True)
-
-            
-            user_info = UserInfo.objects.create(name='深田英利', last_name='深田', first_name='英利', name_furi='ムラヤマ', last_name_furi='', first_name_furi='', phone='080-1234-5678')
-            m_user = User.objects.create(user_info=user_info, email='hukahide3@yahoo.co.jp', password=make_password('password'), permission='super', is_active=True, is_superuser=True, is_staff=True)
         except Exception as e:
             print(str(e))
             raise CommandError('Failed to create super user')

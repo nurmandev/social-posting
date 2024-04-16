@@ -1,14 +1,14 @@
 {       
   apps:            
      [{
-       name: "stock-news",          
+       name: "tokyo-stock-news-stg",          
        script: "manage.py",
-       args: ["runserver", "0.0.0.0:8000"],
+       args: ["runserver", "0.0.0.0:9000"],
        exec_mode: "fork", 
        instances: "1", 
        wait_ready: true, 
        autorestart: false, 
-       max_restarts: 5, 
+       max_restarts: 10, 
        interpreter : "python3" 
      }] 
 }  
