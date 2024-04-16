@@ -158,8 +158,8 @@ class CreateBatchCustomerAPI(APIView):
                             deposit_date = deposit_date,
                             contract_start_date = contract_start_date,
                             contract_days = contract_days,
-                            status = Status.objects.filter(Q(status_type=status)|Q(name=status)).first(),
-                            property = Property.objects.filter(Q(property_type=property)|Q(name=property)).first(),
+                            status = Status.objects.filter(name=status).first(),
+                            property = Property.objects.filter(name=property).first(),
                             system_provided = True if system_provided == "OK" else False,
                             manager = manager
                         )
@@ -324,15 +324,15 @@ class DownloadCustomerAPI(APIView):
                     worksheet.write(row, 7, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
                     worksheet.write(row, 8, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
                     worksheet.write(row, 9, customer.contract_days, font_format)
-                    worksheet.write(row, 10, customer.property.property_type if customer.property else "", font_format)
-                    worksheet.write(row, 11, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 10, customer.property.name if customer.property else "", font_format)
+                    worksheet.write(row, 11, customer.status.name if customer.status else "", font_format)
                     worksheet.write(row, 12, "OK" if customer.system_provided else "NG", font_format)
                 else:
                     worksheet.write(row, 6, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
                     worksheet.write(row, 7, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
                     worksheet.write(row, 8, customer.contract_days, font_format)
-                    worksheet.write(row, 9, customer.property.property_type if customer.property else "", font_format)
-                    worksheet.write(row, 10, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 9, customer.property.name if customer.property else "", font_format)
+                    worksheet.write(row, 10, customer.status.name if customer.status else "", font_format)
                     worksheet.write(row, 11, "OK" if customer.system_provided else "NG", font_format)
                 
                 row += 1
