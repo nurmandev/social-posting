@@ -25,7 +25,7 @@ class GetCustomersAPI(APIView):
         pageSize = int(request.GET.get('pageSize', 10))
 
         try:
-            m_data = Customer.objects.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone__contains=keyword))
+            m_data = Customer.objects.all()
 
             role = get_role(request.user)
             
@@ -42,6 +42,9 @@ class GetCustomersAPI(APIView):
 
             if Property.objects.filter(id=property).exists():
                 m_data = m_data.filter(property=Property.objects.filter(id=property).first())
+
+            if keyword != "":
+                m_data = m_data.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone_2__contains=keyword) | Q(email_2__contains=keyword))
 
             m_data = m_data.order_by(order_by)
             
@@ -138,7 +141,7 @@ class CreateBatchCustomerAPI(APIView):
                     elif role == "admin":
                         manager = User.objects.filter(user_info__name=customer.get('manager', '')).first()
                         if manager is None:
-                            raise Exception("Invalid Data")
+                            manager= request.user
                     
                     if name == "" or email == "" or phone == "" or Customer.objects.filter(email=email).exists():
                         raise Exception("Invalid Data")
@@ -158,8 +161,8 @@ class CreateBatchCustomerAPI(APIView):
                             deposit_date = deposit_date,
                             contract_start_date = contract_start_date,
                             contract_days = contract_days,
-                            status = Status.objects.filter(Q(status_type=status)|Q(name=status)).first(),
-                            property = Property.objects.filter(Q(property_type=property)|Q(name=property)).first(),
+                            status = Status.objects.filter(name=status).first(),
+                            property = Property.objects.filter(name=property).first(),
                             system_provided = True if system_provided == "OK" else False,
                             manager = manager
                         )
@@ -186,24 +189,71 @@ class UpdateCustomerAPI(APIView):
     permission_classes = [IsCustomer]
 
     def get(self, request, customer_id):
+        keyword = request.GET.get('keyword', '')
+        order_by = request.GET.get('order_by', 'id')
+        manager = int(request.GET.get('manager', 0))
+        status = int(request.GET.get('status', 0))
+        property = int(request.GET.get('property', 0))
+        page = int(request.GET.get('page', 1))
+        pageSize = int(request.GET.get('pageSize', 10))
+
         try:
-            customer = Customer.objects.filter(id=customer_id)
+            m_customer = Customer.objects.filter(id=customer_id)
 
             role = get_role(request.user)
             if role == "member":
-                customer = customer.filter(manager=request.user)
+                m_customer = m_customer.filter(manager=request.user)
             elif role == "admin":
                 pass
             else:
                 raise Exception("Forbidden")
 
-            customer = customer.first()
+            m_customer = m_customer.first()
             
-            if customer is None:
+            if m_customer is None:
                 raise Exception("データが見つかりません。")
             
-            serializer = CustomerFlatSerializer(customer)
-            return Response(serializer.data)
+            serializer = CustomerFlatSerializer(m_customer)
+
+            
+            m_data = Customer.objects.all()
+
+            role = get_role(request.user)
+            
+            if role == "admin":
+                if manager != 0:
+                    m_data = m_data.filter(manager=User.objects.filter(id=manager).first())
+            elif role == "member":
+                m_data = m_data.filter(manager=request.user)
+            else:
+                raise Exception("Forbidden")
+                
+            if Status.objects.filter(id=status).exists():
+                m_data = m_data.filter(status=Status.objects.filter(id=status).first())
+
+            if Property.objects.filter(id=property).exists():
+                m_data = m_data.filter(property=Property.objects.filter(id=property).first())
+
+            if keyword != "":
+                m_data = m_data.filter(Q(manager__user_info__name__contains=keyword) | Q(ads__contains=keyword) | Q(name__contains=keyword) | Q(phone__contains=keyword) | Q(email__contains=keyword) | Q(phone_2__contains=keyword) | Q(email_2__contains=keyword))
+
+            m_data = m_data.order_by(order_by)
+            
+            prev = 0
+            next = 0
+
+            for i in range(m_data.count()):
+                if m_data[i].id == m_customer.id:
+                    if i > 0:
+                        prev = m_data[i-1].id
+                    if i < m_data.count()-1:
+                        next = m_data[i+1].id
+
+            return Response({
+                "data": serializer.data,
+                "prev": prev,
+                "next": next
+            })
         except Exception as e:
             print(str(e))
             return Response("Internal Server Error", status=500)
@@ -324,15 +374,15 @@ class DownloadCustomerAPI(APIView):
                     worksheet.write(row, 7, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
                     worksheet.write(row, 8, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
                     worksheet.write(row, 9, customer.contract_days, font_format)
-                    worksheet.write(row, 10, customer.property.property_type if customer.property else "", font_format)
-                    worksheet.write(row, 11, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 10, customer.property.name if customer.property else "", font_format)
+                    worksheet.write(row, 11, customer.status.name if customer.status else "", font_format)
                     worksheet.write(row, 12, "OK" if customer.system_provided else "NG", font_format)
                 else:
                     worksheet.write(row, 6, datetime.datetime.strftime(customer.deposit_date, "%Y-%m-%d") if customer.deposit_date else "", font_format)
                     worksheet.write(row, 7, datetime.datetime.strftime(customer.contract_start_date, "%Y-%m-%d") if customer.contract_start_date else "", font_format)
                     worksheet.write(row, 8, customer.contract_days, font_format)
-                    worksheet.write(row, 9, customer.property.property_type if customer.property else "", font_format)
-                    worksheet.write(row, 10, customer.status.status_type if customer.status else "", font_format)
+                    worksheet.write(row, 9, customer.property.name if customer.property else "", font_format)
+                    worksheet.write(row, 10, customer.status.name if customer.status else "", font_format)
                     worksheet.write(row, 11, "OK" if customer.system_provided else "NG", font_format)
                 
                 row += 1

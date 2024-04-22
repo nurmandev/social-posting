@@ -139,7 +139,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': "cms_db",
+            'NAME': "cms_tokyo_stock_news_db",
             'USER':  "root",
             'PASSWORD':  "",
             'HOST':'localhost',
