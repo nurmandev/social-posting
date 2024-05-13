@@ -35,7 +35,7 @@ class GetCustomerMemoAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class CreateCustomerMemoAPI(APIView):
@@ -72,7 +72,7 @@ class CreateCustomerMemoAPI(APIView):
             
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class UpdateCustomerMemoAPI(APIView):
@@ -110,7 +110,7 @@ class UpdateCustomerMemoAPI(APIView):
             
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
     def delete(self, request, customer_id, memo_id):
@@ -136,4 +136,4 @@ class UpdateCustomerMemoAPI(APIView):
             
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)

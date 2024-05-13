@@ -8,7 +8,7 @@ from django.db.models import *
 from django.db import transaction
 
 from mail.mailbox import send_email_task
-from django_mailbox.models import Message, Mailbox, MessageAttachment
+from django_mailbox.models import MessageAttachment
 
 from db_schema.models import *
 from db_schema.serializers import *

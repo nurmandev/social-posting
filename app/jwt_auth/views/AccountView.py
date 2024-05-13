@@ -66,4 +66,4 @@ class AccountActivateAPI(APIView):
             return Response({"msg": "アカウントが有効になりました。"}, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)

@@ -31,7 +31,7 @@ class CreateAttachmentFileView(APIView):
             }, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 class GetAttachmentFileView(APIView):
@@ -46,4 +46,4 @@ class GetAttachmentFileView(APIView):
             return response
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
