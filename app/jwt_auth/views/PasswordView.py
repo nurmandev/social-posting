@@ -31,7 +31,7 @@ class PasswordChangeView(APIView):
             return Response({"msg": "パスワードを変更しました。"}, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 class PasswordForgotView(APIView):
@@ -50,7 +50,7 @@ class PasswordForgotView(APIView):
             return Response({"msg": "パスワード再設定メールを送信しました。"}, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
         
 
 
@@ -105,4 +105,4 @@ class PasswordResetView(APIView):
             return Response({"msg": "パスワードを変更しました。"}, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)

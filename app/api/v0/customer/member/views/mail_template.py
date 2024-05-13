@@ -27,7 +27,7 @@ class GetMailTemplatesAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
         
 
 class CreateMailTemplateAPI(APIView):
@@ -54,7 +54,7 @@ class CreateMailTemplateAPI(APIView):
                 }, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
         
 
 class UpdateMailTemplateAPI(APIView):
@@ -71,7 +71,7 @@ class UpdateMailTemplateAPI(APIView):
             return Response(serializer.data)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
     
     def patch(self, request, mail_template_id):
         
@@ -98,7 +98,7 @@ class UpdateMailTemplateAPI(APIView):
                 }, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
         
     def delete(self, request, mail_template_id):
         try:
@@ -111,4 +111,4 @@ class UpdateMailTemplateAPI(APIView):
             return Response("OK", status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)

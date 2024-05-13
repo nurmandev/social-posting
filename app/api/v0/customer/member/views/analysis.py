@@ -36,4 +36,4 @@ class GetUserAnalysisAPI(APIView):
 
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)

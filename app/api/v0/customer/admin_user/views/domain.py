@@ -29,7 +29,7 @@ class GetDomainsAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class CreateDomainAPI(APIView):
@@ -92,7 +92,7 @@ class CreateDomainAPI(APIView):
 
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class UpdateDomainAPI(APIView):
@@ -165,7 +165,7 @@ class UpdateDomainAPI(APIView):
 
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
     def delete(self, request, domain_id):
         try:
@@ -178,5 +178,5 @@ class UpdateDomainAPI(APIView):
             }, status=200)
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         

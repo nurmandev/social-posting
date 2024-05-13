@@ -59,4 +59,4 @@ class ProfileView(APIView):
                 })
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=400)
+            return Response({"msg": str(e)}, status=400)

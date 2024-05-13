@@ -56,7 +56,7 @@ class GetCustomersAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class CreateCustomerAPI(APIView):
@@ -95,7 +95,7 @@ class CreateCustomerAPI(APIView):
                 })
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=400)
+            return Response({"msg": str(e)}, status=400)
         
 
 
@@ -182,7 +182,7 @@ class CreateBatchCustomerAPI(APIView):
             return Response(res)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=400)
+            return Response({"msg": str(e)}, status=400)
         
 
 class UpdateCustomerAPI(APIView):
@@ -256,7 +256,7 @@ class UpdateCustomerAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
     def patch(self, request, customer_id):
@@ -291,7 +291,7 @@ class UpdateCustomerAPI(APIView):
                 })
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=400)
+            return Response({"msg": str(e)}, status=400)
         
     
     def delete(self, request, customer_id):
@@ -309,7 +309,7 @@ class UpdateCustomerAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=400)
+            return Response({"msg": str(e)}, status=400)
         
 
 class DownloadCustomerAPI(APIView):
@@ -391,4 +391,4 @@ class DownloadCustomerAPI(APIView):
             return FileResponse(open(path, 'rb'), status=200)
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)

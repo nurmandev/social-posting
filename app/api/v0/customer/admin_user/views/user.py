@@ -29,7 +29,7 @@ class GetUsersAPI(APIView):
             })
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class CreateUserAPI(APIView):
@@ -74,7 +74,7 @@ class CreateUserAPI(APIView):
                 }, status=200)
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
 
 class UpdateUserAPI(APIView):
@@ -123,7 +123,7 @@ class UpdateUserAPI(APIView):
 
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         
     def delete(self, request, user_id):
         try:
@@ -135,5 +135,5 @@ class UpdateUserAPI(APIView):
             }, status=200)
         except Exception as e:
             print(str(e))
-            return Response("Internal Server Error", status=500)
+            return Response(str(e), status=500)
         

@@ -11,7 +11,6 @@ from utils.permissions import *
 # Create your views here.
 
 class GetRoleAPI(APIView):
-    parser_classes = [MultiPartParser]
     
     def get(self, request):
     
@@ -22,11 +21,10 @@ class GetRoleAPI(APIView):
             return Response(serializer.data, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 class GetIMAPAPI(APIView):
-    parser_classes = [MultiPartParser]
     
     def get(self, request):
     
@@ -37,11 +35,10 @@ class GetIMAPAPI(APIView):
             return Response(serializer.data, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 class GetStatusAPI(APIView):
-    parser_classes = [MultiPartParser]
     
     def get(self, request):
     
@@ -52,12 +49,11 @@ class GetStatusAPI(APIView):
             return Response(serializer.data, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 
 class GetPropertyAPI(APIView):
-    parser_classes = [MultiPartParser]
     
     def get(self, request):
     
@@ -68,11 +64,10 @@ class GetPropertyAPI(APIView):
             return Response(serializer.data, status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
 
 class GetDomainAPI(APIView):
-    parser_classes = [MultiPartParser]
     
     def get(self, request):
     
@@ -87,5 +82,5 @@ class GetDomainAPI(APIView):
             ], status=200)
         except Exception as e:
             print(str(e))
-            return Response({"msg": "Internal Server Error"}, status=500)
+            return Response({"msg": str(e)}, status=500)
 
