@@ -16,3 +16,5 @@ django-mailbox
 docxtpl
 XlsxWriter
 django-dbbackup
+celery
+redis

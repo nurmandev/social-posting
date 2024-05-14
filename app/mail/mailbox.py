@@ -4,13 +4,15 @@ from django.db.models import *
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.core.mail import EmailMessage, get_connection
-from django_mailbox.models import Message, Mailbox, MessageAttachment
+from django_mailbox.models import MessageAttachment
+
+from celery import shared_task
+from datetime import datetime
 
 from db_schema.models import *
 from db_schema.serializers import *
-from datetime import datetime
 
-# @app.task
+@shared_task
 def send_email_task(request, recepients, clean_data):
     recepient_users = Customer.objects.filter(id__in=recepients)
     

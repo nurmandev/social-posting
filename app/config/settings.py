@@ -236,6 +236,9 @@ if ON_SERVER:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'jwt_auth.backend.LoggingEmailBackend'
+
+# In your Django project's settings.py, configure Celery to use the chosen message broker. Here's an example configuration for Redis:
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
     
 
 # Maximum size in bytes allowed for uploaded files.
