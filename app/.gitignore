@@ -6,7 +6,11 @@ www/.next
 media/attachments/
 dev/
 backup/
-
+.local_settings
+/static/shops/*
+/dev/*
+/media/mailbox_attachments/*
+/storage/customers/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -302,11 +306,3 @@ dist
 .pnp.*
 
 CACHE/
-
-.local_settings
-
-/static/shops/*
-
-/dev/*
-/media/mailbox_attachments/*
-/storage/customers/*
