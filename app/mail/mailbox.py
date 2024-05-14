@@ -13,7 +13,7 @@ from db_schema.models import *
 from db_schema.serializers import *
 
 @shared_task
-def send_email_task(request, recepients, clean_data):
+def send_email_task(sender, recepients, clean_data):
     recepient_users = Customer.objects.filter(id__in=recepients)
     
     mail_subject = clean_data["subject"]
@@ -55,7 +55,7 @@ def send_email_task(request, recepients, clean_data):
     message = m_box.record_outgoing_message(email_obj.message())
 
     m_customers = Customer.objects.filter(Q(email__in=message.to_addresses) | Q(email_2__in=message.to_addresses))
-    m_managers = User.objects.filter(id=request.user.id)
+    m_managers = User.objects.filter(id=sender)
 
     if m_customers.count() == 0 or m_managers.count() == 0:
         return
