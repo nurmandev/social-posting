@@ -19,24 +19,29 @@ if not IGNORE_DOT_ENV_FILE:
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 ON_SERVER = env("ON_SERVER", default=True)
-PRODUCTION_MODE = env("PRODUCTION_MODE", default="production")
 
 if ON_SERVER:
+    DEBUG = False
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "cms_wavemaster.vercel.app", "162.43.49.87"]
+    ALLOWED_HOSTS = ["localhost", "api.cms.tokyo-stock-news.com", "stg.api.cms.tokyo-stock-news.com"]
     CORS_ALLOWED_ORIGINS = [
-        "https://cms_wavemaster.vercel.app",
-        "https://x162-43-49-87.static.xvps.ne.jp"
+        "https://api.cms.tokyo-stock-news.com",
+        "https://stg.api.cms.tokyo-stock-news.com",
+        "https://cms.tokyo-stock-news.com",
+        "https://stg.cms.tokyo-stock-news.com",
     ]
     CSRF_TRUSTED_ORIGINS = [
-        "https://cms_wavemaster.vercel.app",
-        "https://x162-43-49-87.static.xvps.ne.jp"
+        "https://api.cms.tokyo-stock-news.com",
+        "https://stg.api.cms.tokyo-stock-news.com",
+        "https://cms.tokyo-stock-news.com",
+        "https://stg.cms.tokyo-stock-news.com",
     ]
 else:
+    DEBUG = True
     CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -187,17 +192,11 @@ STORAGE_ROOT = os.path.join(BASE_DIR, 'storage')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-if PRODUCTION_MODE == "staging":
-    MEDIA_URL = '/staging/media/'
-else:
-    MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-if PRODUCTION_MODE == "staging":
-    STATIC_URL = '/staging/static/'
-else:
-    STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 DJANGO_CSS_INLINE_ENABLE = True
 
