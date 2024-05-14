@@ -26,7 +26,7 @@ class CreateMailAPI(APIView):
                 return Response({"errors": errors}, status=status)
 
             recipients = Customer.objects.filter(id__in=clean_data['recipients'])
-            send_email_task(request, [r.id for r in recipients], clean_data)
+            send_email_task.delay(request.user.id, [r.id for r in recipients], clean_data)
             
             return Response({
                 "msg": "メールを送信しました。"
@@ -54,7 +54,7 @@ class CreateGroupMailAPI(APIView):
                 recipients = Customer.objects.filter(property=Property.objects.get(id=clean_data['group']))
                 
                 
-            send_email_task(request, [r.id for r in recipients], clean_data)
+            send_email_task.delay(request.user.id, [r.id for r in recipients], clean_data)
 
             return Response({
                 "msg": "メールを送信しました。"

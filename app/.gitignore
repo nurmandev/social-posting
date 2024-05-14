@@ -5,6 +5,7 @@ www/node_modules
 www/.next
 media/attachments/
 dev/
+backup/
 
 
 # Byte-compiled / optimized / DLL files

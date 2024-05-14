@@ -19,24 +19,29 @@ if not IGNORE_DOT_ENV_FILE:
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+
 ON_SERVER = env("ON_SERVER", default=True)
-PRODUCTION_MODE = env("PRODUCTION_MODE", default="production")
 
 if ON_SERVER:
+    DEBUG = False
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
         "CORS_ORIGIN_REGEX_WHITELIST", default=[]
     )
-    ALLOWED_HOSTS = ["localhost", "x162-43-49-87.static.xvps.ne.jp", "cms_wavemaster.vercel.app", "162.43.49.87"]
+    ALLOWED_HOSTS = ["localhost", "api.cms.tokyo-stock-news.com", "stg.api.cms.tokyo-stock-news.com"]
     CORS_ALLOWED_ORIGINS = [
-        "https://cms_wavemaster.vercel.app",
-        "https://x162-43-49-87.static.xvps.ne.jp"
+        "https://api.cms.tokyo-stock-news.com",
+        "https://stg.api.cms.tokyo-stock-news.com",
+        "https://cms.tokyo-stock-news.com",
+        "https://stg.cms.tokyo-stock-news.com",
     ]
     CSRF_TRUSTED_ORIGINS = [
-        "https://cms_wavemaster.vercel.app",
-        "https://x162-43-49-87.static.xvps.ne.jp"
+        "https://api.cms.tokyo-stock-news.com",
+        "https://stg.api.cms.tokyo-stock-news.com",
+        "https://cms.tokyo-stock-news.com",
+        "https://stg.cms.tokyo-stock-news.com",
     ]
 else:
+    DEBUG = True
     CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ORIGIN_ALLOW_ALL = True
@@ -187,17 +192,11 @@ STORAGE_ROOT = os.path.join(BASE_DIR, 'storage')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-if PRODUCTION_MODE == "staging":
-    MEDIA_URL = '/staging/media/'
-else:
-    MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
 
 # Static files (CSS, JavaScript, Images)
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-if PRODUCTION_MODE == "staging":
-    STATIC_URL = '/staging/static/'
-else:
-    STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 DJANGO_CSS_INLINE_ENABLE = True
 
@@ -236,25 +235,14 @@ if ON_SERVER:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 else:
     EMAIL_BACKEND = 'jwt_auth.backend.LoggingEmailBackend'
+
+# In your Django project's settings.py, configure Celery to use the chosen message broker. Here's an example configuration for Redis:
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", default="redis://localhost:6379/0")
     
 
 # Maximum size in bytes allowed for uploaded files.
-# Adjust this according to your needs.
-# For example, to allow a maximum file size of 10MB:
-# 10MB = 10 * 1024 * 1024 bytes
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
-
 # Maximum size in bytes allowed for a single file uploaded via a multipart/form-data request.
-# Adjust this according to your needs.
-# For example, to allow a maximum file size of 50MB:
-# 50MB = 50 * 1024 * 1024 bytes
 FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50MB
-
 # Maximum size in bytes allowed for an uploaded file.
-# This setting will limit the maximum size of a single uploaded file.
-# Adjust this according to your needs.
-# For example, to allow a maximum file size of 100MB:
-# 100MB = 100 * 1024 * 1024 bytes
-# Note: This setting may not work with all web servers and configurations.
-# It's recommended to configure your web server (e.g., Nginx, Apache) to handle large file uploads.
 FILE_UPLOAD_MAX_SIZE = 100 * 1024 * 1024  # 100MB
