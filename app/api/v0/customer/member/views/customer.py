@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from django.http import FileResponse
 from django.db.models import *
 from django.db import transaction
-from django.contrib.auth.hashers import check_password, make_password
 
 from db_schema.models import *
 from db_schema.serializers import *
@@ -24,10 +23,17 @@ class GetCustomersAPI(APIView):
         page = int(request.GET.get('page', 1))
         pageSize = int(request.GET.get('pageSize', 10))
 
+        customer_ids = request.GET.getlist('customer_ids[]', [])
+        expanded = request.GET.get('expanded', "")
+        
+
         try:
             m_data = Customer.objects.all()
 
             role = get_role(request.user)
+
+            if len(customer_ids) > 0:
+                m_data = m_data.filter(id__in=customer_ids)
             
             if role == "admin":
                 if manager != 0:
@@ -48,12 +54,21 @@ class GetCustomersAPI(APIView):
 
             m_data = m_data.order_by(order_by)
             
-            serializer = CustomerSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
+            if expanded == "False":
+                serializer = CustomerNameSerializer(m_data, many=True)
 
-            return Response({
-                "data": serializer.data,
-                "total": m_data.count()
-            })
+                return Response({
+                    "data": serializer.data,
+                    "total": m_data.count()
+                })
+            else:
+                serializer = CustomerSerializer(m_data[pageSize * (page - 1):pageSize * page], many=True)
+
+                return Response({
+                    "data": serializer.data,
+                    "total": m_data.count()
+                })
+            
         except Exception as e:
             print(str(e))
             return Response(str(e), status=500)

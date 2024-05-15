@@ -39,6 +39,13 @@ class CustomerNameSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Customer
+        fields = ['id', 'name']
+
+
+class CustomerNameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Customer
         fields = ["id", "name", "email"]
 
 class CustomerFlatSerializer(serializers.ModelSerializer):
