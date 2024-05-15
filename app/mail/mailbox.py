@@ -12,7 +12,6 @@ from datetime import datetime
 from db_schema.models import *
 from db_schema.serializers import *
 
-@shared_task
 def send_email_task(sender, recepients, clean_data):
     recepient_users = Customer.objects.filter(id__in=recepients)
     
