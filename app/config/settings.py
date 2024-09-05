@@ -144,7 +144,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'NAME': "cms_tokyo_stock_news_db",
+            'NAME': "auto_posting_tool",
             'USER':  "root",
             'PASSWORD':  "",
             'HOST':'localhost',
