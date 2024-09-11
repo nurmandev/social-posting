@@ -22,6 +22,8 @@ def send_mail(request, email):
     m_reset_token.save()
 
     reset_password_url = f"https://wavemaster.vercel.app/accounts/password/reset?token={token}"
+    
+    print(f"http://localhost:3000/accounts/password/reset?token={token}")
     expire_at =  (datetime.datetime.now()+ datetime.timedelta(days=3)).strftime("%Y/%m/%d %H:%M")
     
     # Send the password reset email

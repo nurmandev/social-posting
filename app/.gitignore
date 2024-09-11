@@ -16,10 +16,10 @@ backup/
 __pycache__/
 *.py[cod]
 *$py.class
-
+analytics_copy.sqlite3
 # C extensions
 *.so
-
+olakay/
 # Distribution / packaging
 .Python
 build/

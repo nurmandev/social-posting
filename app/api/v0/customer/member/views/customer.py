@@ -1,15 +1,345 @@
+from datetime import datetime
+import os , time
+from venv import logger
+from django.core.files.storage import default_storage
+import uuid
+from django.utils import timezone
+from rest_framework.serializers import ValidationError
+from datetime import datetime, timezone as dt_timezone
+from api.v0.customer.member.serializers import CustomersSocialConfigCreateSerializer, PostDispatchPayloadSerializer, SocialConfigListSerializer, SocialConfigUpdateSerializer
+from utils.socials.instagram import InstagramMediaManager
+from jwt_auth.tasks import backgroud_upload, schedule_for_background_upload
+from utils.socials.youtube import YouTubeManager
+from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import FileResponse
 from django.db.models import *
 from django.db import transaction
-
+from tempfile import NamedTemporaryFile
 from db_schema.models import *
 from db_schema.serializers import *
 from utils.permissions import *
 from validations.customer import *
 
 # Create your views here.
+
+
+
+class CreateCustomersSocialConfigAPI1(APIView):
+    permission_classes = [IsCustomer]
+
+    def post(self,request):
+
+        serializer = CustomersSocialConfigCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+
+        social_type = serializer.validated_data['ads']
+        data=request.data
+
+        # Validate the 'ads' field
+        valid_providers = [item for sublist in SocialConfig.AVAILABLE_PROVIDER for item in sublist]
+        if social_type not in valid_providers:
+            raise ValidationError({'ads': 'The value selected is not a valid choice'})
+        
+
+        if social_type == 'YOUTUBE':
+            required_fields = ['google_client_id', 'google_client_secret', 'google_project_id']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                raise ValidationError({field: f'This field is required when ads is {social_type}' for field in missing_fields})
+
+        elif social_type == 'INSTAGRAM':
+            required_fields = ['facebook_client_secret', 'facebook_app_id', 'instagram_business_id']
+            missing_fields = [field for field in required_fields if not data.get(field)]
+            if missing_fields:
+                raise ValidationError({field: f'This field is required when ads is {social_type}' for field in missing_fields})
+
+
+        social_type = serializer.validated_data['ads']
+
+        if social_type == "YOUTUBE":
+            social_config = SocialConfig.objects.create(
+                added_by=request.user,
+                provider=social_type,
+                name=serializer.validated_data['name'],
+                youtube_client_id=serializer.validated_data['google_client_id'],
+                youtube_client_secret=serializer.validated_data['google_client_secret'],
+                youtube_project_id=serializer.validated_data['google_project_id'],
+            )
+            status_code, response=  YouTubeManager.authenticate_user(request,social_config)
+            return Response(response,status=status_code)
+        
+        elif social_type == 'INSTAGRAM':
+
+            social_config = SocialConfig.objects.create(
+                added_by=request.user,
+                provider=social_type,
+                name=serializer.validated_data['name'],
+                instagram_business_id=request.data['instagram_business_id'],
+                facebook_app_id=request.data['facebook_app_id'],
+                facebook_client_secret=request.data['facebook_client_secret'],
+            )
+
+            instagram_manager = InstagramMediaManager()
+            status_code, response= instagram_manager.facebook_login(request.data['facebook_app_id'],social_config.id)
+            
+            return Response(response,status=status_code)
+
+        return Response({"msg": "顧客情報が正常に登録されました。"})
+
+
+
+class CreateCustomersSocialConfigAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def post(self, request):
+        # Deserialize request data
+        serializer = CustomersSocialConfigCreateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        social_type = serializer.validated_data['ads']
+        data = request.data
+
+        # Validate social_type
+        valid_providers = [item for sublist in SocialConfig.AVAILABLE_PROVIDER for item in sublist]
+        if social_type not in valid_providers:
+            raise ValidationError({'ads': '選択された値は有効な選択肢ではありません。'})
+        
+        
+
+        # Validate required fields based on social_type
+        self._validate_required_fields(social_type, data)
+
+
+        # Check if the user already has this type of credentials
+        if SocialConfig.objects.filter(added_by=request.user, provider=social_type, verified = True).exists():
+            return Response(
+                {"msg": "指定されたタイプの認証情報は既に登録されています。"},
+                status=400
+            )
+
+        # Create SocialConfig instance
+        social_config = self._create_social_config(social_type, serializer.validated_data, request.user)
+
+        # Authenticate user and return response
+        if social_type == "YOUTUBE":
+            status_code, response = YouTubeManager.authenticate_user(request, social_config)
+        elif social_type == 'INSTAGRAM':
+            instagram_manager = InstagramMediaManager()
+            status_code, response = instagram_manager.facebook_login(data['facebook_app_id'], social_config.id)
+        else:
+            return Response({"msg": "無効なソーシャルタイプが提供されました"}, status=400)
+
+        return Response(response, status=status_code)
+
+    def _validate_required_fields(self, social_type, data):
+        """Validate required fields based on the social_type."""
+        if social_type == 'YOUTUBE':
+            required_fields = ['google_client_id', 'google_client_secret', 'google_project_id']
+        elif social_type == 'INSTAGRAM':
+            required_fields = ['facebook_client_secret', 'facebook_app_id', 'instagram_business_id']
+        else:
+            return
+
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        if missing_fields:
+            raise ValidationError({field: f'このフィールドは{social_type}の場合に必要です。' for field in missing_fields})
+
+    def _create_social_config(self, social_type, validated_data, user):
+        """Create and return a SocialConfig instance based on the social_type."""
+        config_params = {
+            'added_by': user,
+            'provider': social_type,
+            'name': validated_data['name']
+        }
+
+        if social_type == 'YOUTUBE':
+            config_params.update({
+                'youtube_client_id': validated_data['google_client_id'],
+                'youtube_client_secret': validated_data['google_client_secret'],
+                'youtube_project_id': validated_data['google_project_id']
+            })
+        elif social_type == 'INSTAGRAM':
+            config_params.update({
+                'instagram_business_id': validated_data['instagram_business_id'],
+                'facebook_app_id': validated_data['facebook_app_id'],
+                'facebook_client_secret': validated_data['facebook_client_secret']
+            })
+
+        return SocialConfig.objects.create(**config_params)
+
+
+
+class CreateCustomersSocialConfigCallbackAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def get(self,request):
+        state = request.GET.get('state')
+
+        print(request.GET)
+
+        try:
+            if state:
+                try:
+                    extra_params = json.loads(state)
+                except:
+                    extra_params = eval(state)
+
+                config_id = extra_params.get('configID')
+                try:
+                    config = SocialConfig.objects.get(id=config_id)
+                except:return Response({},status=404)
+
+
+                if config.provider == "INSTAGRAM":
+                    code = request.GET.get('code')
+                    instagram_manager = InstagramMediaManager()
+                    return instagram_manager.facebook_callback(
+                        code=code,
+                        social_config=config
+                    )
+                
+                elif config.provider == "INSTAGRAM":
+
+                    return YouTubeManager.callback_handler(request,config)
+
+            return Response({"msg": "顧客情報が正常に登録されました。"})
+        except Exception as e:
+            print(e)
+            return Response({"msg": "エラーが発生しました。再試行してください。"},status=500)
+    
+
+
+class GetCustomersSocialConfigAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def get(self,request,customer_id):
+        try:
+
+            social_configs = SocialConfig.objects.get(id=customer_id)
+        except Exception as e:
+            print(e)
+            return Response({"msg": "顧客情報が正常に登録されました。"},status=404)
+        
+        serializers = SocialConfigListSerializer(social_configs)
+
+        return Response({"msg": "顧客情報が正常に登録されました。","data":serializers.data})
+    
+
+
+    def delete(self,request,customer_id):
+        try:
+            social_configs = SocialConfig.objects.get(id=customer_id)
+        except:return Response({"msg": "顧客情報が正常に登録されました。"},status=404)
+        
+        social_configs.delete()
+
+        return Response({"msg": "顧客情報が正常に登録されました。"})
+    
+
+    def patch(self,request,customer_id):
+        try:
+
+            social_config = SocialConfig.objects.get(id=customer_id)
+        except:return Response({"msg": "顧客情報が正常に登録されました。"},status=404)
+        
+        serializer = SocialConfigUpdateSerializer(social_config, data=request.data, partial=True)
+        
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        print(request.data)
+        serializers = SocialConfigListSerializer(social_config)
+        return Response({"msg": "顧客情報が正常に登録されました。","data":serializers.data})
+    
+
+
+class ListCustomersSocialConfigAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def get(self,request):
+        role = get_role(request.user)
+        if role == "admin":
+            social_configs = SocialConfig.objects.filter().order_by("-created_at")
+        elif role == "member":
+            social_configs = SocialConfig.objects.filter(added_by=request.user).order_by("-created_at")
+        else:
+            raise Exception("Forbidden")
+        
+        
+        serializers = SocialConfigListSerializer(social_configs, many=True)
+
+        return Response({"msg": "顧客情報が正常に登録されました。","data":serializers.data})
+
+
+class DispatchVideoAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def post(self, request):
+        serializer = PostDispatchPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # File size validation
+        videos = request.FILES.getlist('video')
+        max_size_mb = 100
+        for video in videos:
+            if video.size > max_size_mb * 1024 * 1024:
+                return Response(
+                    {'video': f'File size exceeds {max_size_mb} MB.'},
+                    status=400
+                )
+
+        # Determine chosen platforms
+        choices = [key.upper() for key in ['youtube', 'tiktok', 'instagram'] if request.data.get(f'is_{key}') == 'true']
+
+        description = serializer.validated_data['description']
+        title = serializer.validated_data['title']
+        status_code = 200
+
+        try:
+            processing_id = str(uuid.uuid4())
+            user_id = request.user.id
+
+            with transaction.atomic():
+                video_objs = [
+                    ScheduleVideo.objects.create(
+                        file=video,
+                        added_by=request.user,
+                        processing_id=processing_id,
+                        title=title,
+                        description=description
+                    ) for video in videos
+                ]
+
+                if request.data.get("instance_dispatch") == "true":
+                    schedule_for_background_upload.delay(
+                        title,
+                        description,
+                        user_id,
+                        processing_id,
+                        choices
+                    )
+                else:
+                    task_datetime = serializer.validated_data['task_datetime']
+
+                    # Ensure task_datetime is timezone-aware and in 'Africa/Lagos' timezone
+                    task_datetime_aware = timezone.make_aware(task_datetime, timezone.get_current_timezone())
+                    
+                    task_datetime_utc = task_datetime_aware.astimezone(dt_timezone.utc)
+
+                    schedule_for_background_upload.apply_async(
+                        args=[title, description, user_id, processing_id, choices],
+                        eta=task_datetime_utc
+                    )
+
+        except Exception as e:
+            logger.error(f"An error occurred: {e}")
+            return Response({"msg": "リクエストの処理中にエラーが発生しました"}, status=500)
+
+        return Response({"msg": "顧客情報が正常に登録されました。"}, status=status_code)
+
+
+
 
 class GetCustomersAPI(APIView):
     permission_classes = [IsCustomer]

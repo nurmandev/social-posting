@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from django.db.models import *
 from django.db import transaction
 from django.contrib.auth.hashers import check_password, make_password
-
+import time
 from db_schema.models import *
 from db_schema.serializers import *
 from utils.permissions import *
@@ -15,6 +15,8 @@ class GetUsersAPI(APIView):
     permission_classes = [IsCustomerAndAdmin]
     
     def get(self, request):
+        
+        
         keyword = request.GET.get('keyword', '')
         page = int(request.GET.get('page', 1))
         pageSize = int(request.GET.get('pageSize', 10))

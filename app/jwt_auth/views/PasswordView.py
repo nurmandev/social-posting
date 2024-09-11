@@ -68,7 +68,7 @@ class PasswordResetView(APIView):
             rslt = default_token_generator.check_token(m_user, token)
             
             if rslt:
-                if m_item.expire_at > datetime.datetime.now():
+                if m_item.expire_at.date() > datetime.datetime.now().date():
                     return Response("success", status=200)
                 else:
                     return Response("token has expired", status=400)
@@ -90,7 +90,7 @@ class PasswordResetView(APIView):
             m_item = ResetToken.objects.get(token=token)
             m_user = User.objects.get(id=m_item.user.id)
 
-            if default_token_generator.check_token(m_user, token) == False or m_item.expire_at < datetime.datetime.now():
+            if default_token_generator.check_token(m_user, token) == False or m_item.expire_at.date() < datetime.datetime.now().date():
                 return Response({"msg": "無効なトークンです。"}, status=400)
 
             errors, status, clean_data = validate_reset_password(request)

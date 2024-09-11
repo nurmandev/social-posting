@@ -8,6 +8,8 @@ class LoggingEmailBackend(EmailBackend):
     A wrapper around the SMTP backend that logs all emails to the DB.
     """
     def send_messages(self, email_messages):
+        print("send_messaage")
+        print(email_messages)
         """
         A helper method that does the actual logging
         """
@@ -19,14 +21,16 @@ class LoggingEmailBackend(EmailBackend):
                     to='; '.join(email_message.recipients()),
                     subject=email_message.subject, body=email_message.body,
                 )
+                print(email_record)
 
-                try:
-                    return super(LoggingEmailBackend, self)._send(
-                        email_message
-                    )
-                except:
-                    email_record.ok = False
-                    return False
-                finally:
-                    email_record.ok = True
-                    return True
+                # try:
+                #     return super(LoggingEmailBackend, self)._send(
+                #         email_message
+                #     )
+                # except Exception as e:
+                #     print(e)
+                #     email_record.ok = False
+                #     return False
+                # finally:
+                #     email_record.ok = True
+                #     return True

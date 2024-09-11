@@ -18,11 +18,16 @@ def send_mail(request, email):
     
     token = default_token_generator.make_token(m_user)
     
-    RegisterToken.objects.filter(user_id=m_user.id).delete()
+    # RegisterToken.objects.filter(user_id=m_user.id).delete()
     m_reset_token = RegisterToken(user_id=m_user.id, token=token, expire_at=(datetime.datetime.now()+ datetime.timedelta(days=90)))
     m_reset_token.save()
 
     activate_url = f"https://wavemaster.vercel.app/accounts/activate?token={token}"
+
+
+    print("Activation Link ===========")
+    print(activate_url)
+    print("=================")
     
     # Send the password reset email
     mail_subject = "システムに登録されました。"
@@ -37,3 +42,5 @@ def send_mail(request, email):
     )
     email_obj.content_subtype = "html"
     email_obj.send()
+
+    return True

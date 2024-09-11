@@ -19,6 +19,15 @@ urlpatterns = [
 
     # Customer
     re_path(r'^customers/$', GetCustomersAPI.as_view(), name='get_customers'),
+
+
+    re_path(r'^customers/create/sns$', CreateCustomersSocialConfigAPI.as_view(), name='create_customer_condfig'),
+    re_path(r'^customers/sns$', ListCustomersSocialConfigAPI.as_view(), name='get_customers_config'),
+    re_path(r'^customers/post/dispatch$', DispatchVideoAPI.as_view(), name='post_video_dispatch'),
+    re_path(r'^customers/sns/(?P<customer_id>[0-9]+)$', GetCustomersSocialConfigAPI.as_view(), name='update_customer_sns'),
+
+
+    re_path(r'^customers/create/callback$', CreateCustomersSocialConfigCallbackAPI.as_view(), name='get_customers'),
     re_path(r'^customers/create$', CreateCustomerAPI.as_view(), name='create_customer'),
     re_path(r'^customers/batch_create$', CreateBatchCustomerAPI.as_view(), name='create_multi_customer'),
     re_path(r'^customers/download$', DownloadCustomerAPI.as_view(), name='download_customer'),

@@ -40,6 +40,36 @@ class UserInfo(models.Model):
         verbose_name_plural = "担当情報管理"
 
 
+from django.contrib.auth.models import BaseUserManager
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        """
+        Create and return a regular user with an email and password.
+        """
+        if not email:
+            raise ValueError(_('The Email field must be set'))
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        """
+        Create and return a superuser with an email and password.
+        """
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError(_('Superuser must have is_staff=True.'))
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError(_('Superuser must have is_superuser=True.'))
+
+        return self.create_user(email, password, **extra_fields)
+
+
 class User(AbstractUser):
     user_id = models.CharField(max_length=50, null=True, blank=True)
     user_info = models.ForeignKey(UserInfo, on_delete=models.CASCADE, blank=True, null=True)
@@ -61,6 +91,8 @@ class User(AbstractUser):
 
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.email
@@ -99,4 +131,6 @@ class Email(models.Model):
 
     class Meta:
         verbose_name = "メール"
-        verbose_name_plural = "メール管理"
+        verbose_name_plural = "メール管理" 
+
+

@@ -1,6 +1,7 @@
 from django.db import models
 from django_mailbox.models import Message, Mailbox, MessageAttachment
 import json
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 
 from jwt_auth.models import *
 # Create your models here.
@@ -165,3 +166,76 @@ class Mail(models.Model):
     class Meta:
         verbose_name = "メール"
         verbose_name_plural = "メール管理"
+
+
+
+
+
+
+
+class SocialConfig(models.Model):
+    AVAILABLE_PROVIDER = (
+        ("YOUTUBE","YOUTUBE"),
+        ("TIKTOK","TIKTOK"),
+        ("INSTAGRAM","INSTAGRAM"),
+    )
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL , null=True ,blank=True)
+    name = models.CharField(max_length=100, default="",null=True,blank=True)
+    description = models.TextField(null=True,blank=True)
+    provider = models.CharField(choices=AVAILABLE_PROVIDER,max_length=10,default="YOUTUBE")
+    youtube_token = models.TextField(null=True,blank=True)
+    youtube_client_id = models.TextField(null=True,blank=True)
+    youtube_client_secret = models.TextField(null=True,blank=True)
+    youtube_project_id = models.TextField(null=True,blank=True)
+    youtube_refresh_token = models.TextField(null=True,blank=True)
+    youtube_credentials = models.JSONField(null=True,blank=True)
+    youtube_credentials_data = models.JSONField(null=True,blank=True)
+    scopes = models.TextField(null=True,blank=True)
+
+
+    # facebook credentials
+    facebook_client_secret = models.TextField(null=True,blank=True)
+    facebook_app_id = models.TextField(null=True,blank=True)
+    instagram_business_id = models.TextField(null=True,blank=True)
+    facebook_access_token = models.TextField(null=True,blank=True)
+
+    # INSTAGRAM_BUSINESS_ACCOUNT_ID
+
+    is_active = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # def __str__(self):
+    #     return f"{self.user.username} - YouTube Token"
+    
+
+    
+
+
+    @staticmethod
+    def update_social_token(user, youtube_token, youtube_refresh_token, youtube_credentials, scopes,youtube_credentials_data):
+        social_token, created = SocialConfig.objects.get_or_create(user=user)
+        social_token.youtube_token = youtube_token
+        social_token.youtube_refresh_token = youtube_refresh_token
+        social_token.youtube_credentials = youtube_credentials
+        social_token.scopes = scopes
+        social_token.youtube_credentials_data = youtube_credentials_data
+        social_token.save()
+        
+        return social_token
+
+
+
+
+class ScheduleVideo(models.Model):
+    file = models.FileField(upload_to='schedule_videos/',storage=VideoMediaCloudinaryStorage())
+    added_by = models.ForeignKey(User, on_delete=models.SET_NULL , null=True ,blank=True)
+    title = models.CharField(max_length=255)
+    processing_id = models.CharField(max_length=64,null=True,blank=True)
+    completed = models.BooleanField(default=False)
+    description = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
