@@ -26,7 +26,7 @@ SECRET_KEY = env("SECRET_KEY")
 
 ON_SERVER = env("ON_SERVER", default=True)
 
-ON_SERVER = False
+
 if ON_SERVER:
     DEBUG = False
     CORS_ORIGIN_REGEX_WHITELIST = env.list(
@@ -74,6 +74,7 @@ THIRD_PARTY_APPS = [
     'django_crontab',
     'dbbackup',
     'cloudinary',
+    "django_celery_beat"
 ]
 OUR_APPS = [
     "jwt_auth",
