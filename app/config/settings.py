@@ -253,5 +253,5 @@ FILE_UPLOAD_MAX_SIZE = 100 * 1024 * 1024  # 100MB
 
 
 
-
+# this will be change to the configure uri on facebook
 FACEBOOK_REDIRECT_URI = 'https://olanrewajukabiru.vercel.app/'
