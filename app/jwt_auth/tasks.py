@@ -104,7 +104,8 @@ def schedule_for_background_upload(title, description, user_id, processing_id, c
                             logger.error(f"Instagram upload error: {res.get('error')}")
                             continue
                         
-                    video.delete()
+                    video.completed = True
+                    video.save()
                     logger.info(f"Successfully processed and deleted video {video.id} for provider {social.provider}")
                     
                 except Exception as e:

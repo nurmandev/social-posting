@@ -1,8 +1,8 @@
+from datetime import timedelta
 from django.db import models
 from django_mailbox.models import Message, Mailbox, MessageAttachment
-import json
+from django.utils import timezone
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage
-
 from jwt_auth.models import *
 # Create your models here.
 
@@ -239,3 +239,10 @@ class ScheduleVideo(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+
+    def is_expired(self):
+        now = timezone.now().date()
+        thirty_days_ago = now - timedelta(days=30)
+        return self.created_at.date() < thirty_days_ago
