@@ -1,9 +1,11 @@
 from datetime import datetime
+import json
 import os , time
 from venv import logger
 from django.core.files.storage import default_storage
 import uuid
 from django.utils import timezone
+from utils.socials.twitter import TwitterMediaManager
 from rest_framework.serializers import ValidationError
 from datetime import datetime, timezone as dt_timezone
 from api.v0.customer.member.serializers import CustomersSocialConfigCreateSerializer, PostDispatchPayloadSerializer, SocialConfigListSerializer, SocialConfigUpdateSerializer
@@ -14,6 +16,7 @@ from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import FileResponse
+from django.shortcuts import redirect
 from django.db.models import *
 from django.db import transaction
 from tempfile import NamedTemporaryFile
@@ -128,6 +131,10 @@ class CreateCustomersSocialConfigAPI(APIView):
         elif social_type == 'INSTAGRAM':
             instagram_manager = InstagramMediaManager()
             status_code, response = instagram_manager.facebook_login(data['facebook_app_id'], social_config.id)
+
+        elif social_type == 'TWITTER':
+            twitter_manager = TwitterMediaManager()
+            status_code, response = twitter_manager.twitter_authorize(request,social_config.id)
         else:
             return Response({"msg": "無効なソーシャルタイプが提供されました"}, status=400)
 
@@ -197,13 +204,21 @@ class CreateCustomersSocialConfigCallbackAPI(APIView):
                     instagram_manager = InstagramMediaManager()
                     return instagram_manager.facebook_callback(
                         code=code,
-                        social_config=config
+                        social_config=config,
+                        request=request
                     )
                 
                 elif config.provider == "INSTAGRAM":
 
                     return YouTubeManager.callback_handler(request,config)
 
+            else:
+
+                time.sleep(5)
+                # return Response({"msg": "顧客情報が正常に登録されました。"},status=500)
+                if request.GET.get('oauth_verifier'):
+                    twitter_manager = TwitterMediaManager()
+                    return twitter_manager.twitter_callback(request)
             return Response({"msg": "顧客情報が正常に登録されました。"})
         except Exception as e:
             print(e)
@@ -230,11 +245,21 @@ class GetCustomersSocialConfigAPI(APIView):
 
     def delete(self,request,customer_id):
         try:
-            social_configs = SocialConfig.objects.get(id=customer_id)
+            social_config = SocialConfig.objects.get(id=customer_id)
         except:return Response({"msg": "顧客情報が正常に登録されました。"},status=404)
         
-        social_configs.delete()
+        
 
+
+        try:
+            user_profile:UserInfo = request.user.user_info
+            if social_config.provider == 'YOUTUBE':
+                user_profile.is_youtube = False
+            elif social_config.provider == 'INSTAGRAM':
+                user_profile.is_instagram = False
+            user_profile.save()
+        except:pass
+        social_config.delete()
         return Response({"msg": "顧客情報が正常に登録されました。"})
     
 
@@ -251,6 +276,30 @@ class GetCustomersSocialConfigAPI(APIView):
         print(request.data)
         serializers = SocialConfigListSerializer(social_config)
         return Response({"msg": "顧客情報が正常に登録されました。","data":serializers.data})
+    
+
+
+class GetCustomersSocialConfigForRefreshAPI(APIView):
+    permission_classes = [IsCustomer]
+
+    def get(self,request,customer_id):
+        try:
+
+            social_config = SocialConfig.objects.get(id=customer_id)
+        except Exception as e:
+            print(e)
+            return Response({"msg": "顧客情報が正常に登録されました。"},status=404)
+        
+        if social_config.provider == "YOUTUBE":
+            status_code, response = YouTubeManager.authenticate_user(request, social_config)
+        elif social_config.provider == 'INSTAGRAM':
+            instagram_manager = InstagramMediaManager()
+            status_code, response = instagram_manager.facebook_login(social_config.facebook_app_id, social_config.id)
+        else:
+            return Response({"msg": "無効なソーシャルタイプが提供されました"}, status=400)
+        
+
+        return Response(response, status=status_code)
     
 
 
@@ -279,6 +328,10 @@ class DispatchVideoAPI(APIView):
         serializer = PostDispatchPayloadSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        # time.sleep(10)
+
+        # return Response({"msg": "顧客情報が正常に登録されました。"}, status=400)
+
         # File size validation
         videos = request.FILES.getlist('video')
         max_size_mb = 100
@@ -290,10 +343,22 @@ class DispatchVideoAPI(APIView):
                 )
 
         # Determine chosen platforms
-        choices = [key.upper() for key in ['youtube', 'tiktok', 'instagram'] if request.data.get(f'is_{key}') == 'true']
+        choices = [key.upper() for key in ['youtube', 'tiktok', 'instagram','twitter'] if request.data.get(f'is_{key}') == 'true']
 
+
+
+        print(choices)
+        print(choices)
+        print(choices)
+        print(choices)
         description = serializer.validated_data['description']
         title = serializer.validated_data['title']
+        youtube_title = request.data.get('youtube_title')
+        youtube_description = request.data.get('youtube_description')
+        tiktok_description = request.data.get('tiktok_description')
+        instagram_description = request.data.get('instagram_description')
+        twitter_description = request.data.get('twitter_description')
+
         status_code = 200
 
         try:
@@ -307,6 +372,12 @@ class DispatchVideoAPI(APIView):
                         added_by=request.user,
                         processing_id=processing_id,
                         title=title,
+                        youtube_description=youtube_description,
+                        tiktok_description=tiktok_description,
+                        instagram_description=instagram_description,
+                        twitter_description=twitter_description,
+                        youtube_title=youtube_title,
+                        socials=choices,
                         description=description
                     ) for video in videos
                 ]
@@ -737,3 +808,7 @@ class DownloadCustomerAPI(APIView):
         except Exception as e:
             print(str(e))
             return Response(str(e), status=500)
+        
+
+
+

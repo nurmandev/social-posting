@@ -191,6 +191,11 @@ class SocialConfigUpdateSerializer(serializers.ModelSerializer):
 class PostDispatchPayloadSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=255)
     description = serializers.CharField(max_length=1000)
+    youtube_title = serializers.CharField(max_length=255)
+    youtube_description = serializers.CharField(max_length=1000)
+    tiktok_description = serializers.CharField(max_length=1000)
+    instagram_description = serializers.CharField(max_length=1000)
+    twitter_description = serializers.CharField(max_length=350)
     is_youtube = serializers.BooleanField()
     is_tiktok = serializers.BooleanField()
     is_instagram = serializers.BooleanField()
@@ -233,6 +238,14 @@ class PostDispatchPayloadSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'date': 'The scheduled date and time must be in the future'})
                 # raise serializers.ValidationError("The scheduled time must be in the future.")
             data['task_datetime'] = task_datetime
+        
+        # if is_youtube:
+        #     youtube_title:str = data.get('youtube_title','')
+            
+        #     if len(youtube_title.strip()) < 0:
+        #         raise serializers.ValidationError({'date': 'This field is required when instance_dispatch is False.'})
+
+
         return data
     
     

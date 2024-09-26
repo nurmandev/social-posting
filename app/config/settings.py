@@ -255,3 +255,7 @@ FILE_UPLOAD_MAX_SIZE = 100 * 1024 * 1024  # 100MB
 
 # this will be change to the configure uri on facebook
 FACEBOOK_REDIRECT_URI = 'https://olanrewajukabiru.vercel.app/'
+
+
+TWITTER_API_KEY=env("TWITTER_API_KEY")
+TWITTER_API_SECRET=env("TWITTER_API_SECRET")

@@ -178,6 +178,7 @@ class SocialConfig(models.Model):
         ("YOUTUBE","YOUTUBE"),
         ("TIKTOK","TIKTOK"),
         ("INSTAGRAM","INSTAGRAM"),
+        ("TWITTER","TWITTER"),
     )
     added_by = models.ForeignKey(User, on_delete=models.SET_NULL , null=True ,blank=True)
     name = models.CharField(max_length=100, default="",null=True,blank=True)
@@ -191,6 +192,11 @@ class SocialConfig(models.Model):
     youtube_credentials = models.JSONField(null=True,blank=True)
     youtube_credentials_data = models.JSONField(null=True,blank=True)
     scopes = models.TextField(null=True,blank=True)
+
+
+    # twitter
+    twitter_access_token = models.TextField(null=True,blank=True)
+    twitter_access_token_secret = models.TextField(null=True,blank=True)
 
 
     # facebook credentials
@@ -235,6 +241,12 @@ class ScheduleVideo(models.Model):
     processing_id = models.CharField(max_length=64,null=True,blank=True)
     completed = models.BooleanField(default=False)
     description = models.TextField(blank=True, null=True)
+    youtube_title = models.TextField(blank=True, null=True)
+    youtube_description = models.TextField(blank=True, null=True)
+    tiktok_description = models.TextField(blank=True, null=True)
+    instagram_description = models.TextField(blank=True, null=True)
+    twitter_description = models.TextField(blank=True, null=True)
+    socials = models.JSONField(default=list)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

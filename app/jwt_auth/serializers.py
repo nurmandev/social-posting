@@ -12,7 +12,7 @@ class UserInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInfo
-        fields = ["name", "last_name", "first_name", "name_furi", "last_name_furi", "first_name_furi", "phone", "role"]
+        fields = ["name", "last_name", "first_name", "name_furi", "last_name_furi", "first_name_furi", "phone","is_youtube","is_instagram","is_tiktok","is_twitter", "role"]
         
 class UserSerializer(serializers.ModelSerializer):
     user_info = UserInfoSerializer(read_only=True)

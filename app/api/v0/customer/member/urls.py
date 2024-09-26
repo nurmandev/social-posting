@@ -25,6 +25,7 @@ urlpatterns = [
     re_path(r'^customers/sns$', ListCustomersSocialConfigAPI.as_view(), name='get_customers_config'),
     re_path(r'^customers/post/dispatch$', DispatchVideoAPI.as_view(), name='post_video_dispatch'),
     re_path(r'^customers/sns/(?P<customer_id>[0-9]+)$', GetCustomersSocialConfigAPI.as_view(), name='update_customer_sns'),
+    re_path(r'^customers/sns/(?P<customer_id>[0-9]+)/refresh$', GetCustomersSocialConfigForRefreshAPI.as_view(), name='refresh_customer_sns'),
 
 
     re_path(r'^customers/create/callback$', CreateCustomersSocialConfigCallbackAPI.as_view(), name='get_customers'),

@@ -26,9 +26,10 @@ class UserInfo(models.Model):
     last_name_furi = models.CharField(max_length=50, blank=True, null=True)
     first_name_furi = models.CharField(max_length=50, blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True)
-    is_youtube = models.BooleanField(default=True)
-    is_instagram = models.BooleanField(default=True)
-    is_facebook = models.BooleanField(default=True)
+    is_youtube = models.BooleanField(default=False)
+    is_instagram = models.BooleanField(default=False)
+    is_tiktok = models.BooleanField(default=False)
+    is_twitter = models.BooleanField(default=False)
 
     role = models.ForeignKey(Role, on_delete=models.CASCADE, blank=True, null=True)
 

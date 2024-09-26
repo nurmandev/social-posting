@@ -1,6 +1,7 @@
 import time 
 import json 
 from io import BytesIO 
+from jwt_auth.models import UserInfo
 from googleapiclient.http import MediaIoBaseUpload  
 from googleapiclient.errors import HttpError 
 from urllib.parse import urlencode  
@@ -138,6 +139,15 @@ class YouTubeManager:
             user_tokens.youtube_credentials_data = youtube_credentials_data
             user_tokens.verified = True
             user_tokens.save()
+
+
+            # get the user and update the user social record
+            try:
+                user_profile:UserInfo = request.user.user_info
+                user_profile.is_youtube = True
+                user_profile.save()
+            except:pass
+
 
             return Response({'msg': "顧客情報が正常に登録されました。"}, status=200)
 

@@ -1,3 +1,5 @@
+import logging
+import traceback
 from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -23,6 +25,8 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
+
+        
         
         try:
             serializer = UserFlatSerializer(request.user.user_info)
@@ -34,6 +38,7 @@ class ProfileView(APIView):
             return Response({"msg": "Can't find User Info"}, status=404)
     
     def post(self, request):
+        print(request.data)
         
         try:
             errors, status, clean_data = validate_profile(request)
@@ -50,7 +55,7 @@ class ProfileView(APIView):
                 m_user.user_info.last_name_furi = clean_data['last_name_furi']
                 m_user.user_info.first_name_furi = clean_data['first_name_furi']
                 m_user.user_info.name = clean_data['last_name'] + " " + clean_data['first_name']
-                m_user.user_info.name_furi = clean_data['last_name_furi'] + " " + clean_data['first_name_furi']
+                m_user.user_info.name_furi = clean_data['last_name_furi'] + " " + clean_data.get('first_name_furi') if clean_data.get('first_name_furi') else ''
                 m_user.user_info.phone = clean_data['phone']
                 m_user.user_info.save()
 
@@ -58,5 +63,6 @@ class ProfileView(APIView):
                     "msg": "プロフィール情報が正常に更新されました。"
                 })
         except Exception as e:
-            print(str(e))
+            logging.error(e)
+            logging.error(traceback.print_exc())
             return Response({"msg": str(e)}, status=400)

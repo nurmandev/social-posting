@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from db_schema.models import ScheduleVideo, SocialConfig
 from utils.socials.youtube import YouTubeManager
 from utils.socials.instagram import InstagramMediaManager
+from utils.socials.twitter import TwitterMediaManager
 
 logger = logging.getLogger(__name__)
 
@@ -58,13 +59,17 @@ def backgroud_upload(t_time):
 
 
 
-
+def remove_social_from_socials_list(string_list:list, string_to_remove:str):
+    if string_to_remove in string_list:
+        string_list.remove(string_to_remove)
+    return string_list
 # Configure logging
 
 @shared_task
 def schedule_for_background_upload(title, description, user_id, processing_id, choices):
     try:
         # Fetch social configurations and log the count
+        print(choices)
         social_configs = SocialConfig.objects.filter(provider__in=choices, added_by__id=user_id)
         logger.info(f"Fetched {social_configs.count()} social_configs for user_id {user_id}")
 
@@ -75,7 +80,8 @@ def schedule_for_background_upload(title, description, user_id, processing_id, c
         
         providers_map = {
             "YOUTUBE": YouTubeManager,
-            "INSTAGRAM": InstagramMediaManager
+            "INSTAGRAM": InstagramMediaManager,
+            "TWITTER": TwitterMediaManager
         }
 
         for video in videos:
@@ -91,18 +97,34 @@ def schedule_for_background_upload(title, description, user_id, processing_id, c
                         status_code, message, response = provider_manager.upload_video(
                             social_config=social,
                             video_file=video.file,
-                            title=title,
-                            description=description
+                            title=video.youtube_title,
+                            description=video.youtube_description
                         )
+                        if status_code == 200:
+                            video.socials = remove_social_from_socials_list(video.socials or [],"YOUTUBE")
+                    elif social.provider == "TWITTER":
+                        twitter_manager: TwitterMediaManager = provider_manager()
+                        response = twitter_manager.post_tweet(
+                            social_config=social,
+                            video_file=video.file.url,
+                            description=video.youtube_description
+                        )
+                        if response.get("error"):
+                            logger.error(f"TWITTER upload error: {response.get('error')}")
+                            continue
+                        else:
+                            video.socials = remove_social_from_socials_list(video.socials or [],"INSTAGRAM")
                     elif social.provider == "INSTAGRAM":
-                        instagram_manager = provider_manager(
+                        instagram_manager : InstagramMediaManager = provider_manager(
                             instagram_business_account_id=social.instagram_business_id,
                             access_token=social.facebook_access_token
                         )
-                        res = instagram_manager.handle_video_upload(video_url=video.file.url, caption=title)
-                        if res.get("error"):
-                            logger.error(f"Instagram upload error: {res.get('error')}")
+                        response = instagram_manager.handle_video_upload(video_url=video.file.url, caption=video.instagram_description)
+                        if response.get("error"):
+                            logger.error(f"Instagram upload error: {response.get('error')}")
                             continue
+                        else:
+                            video.socials = remove_social_from_socials_list(video.socials or [],"INSTAGRAM")
                         
                     video.completed = True
                     video.save()

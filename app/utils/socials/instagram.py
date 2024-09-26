@@ -4,6 +4,7 @@ import requests
 import urllib.parse
 from django.conf import settings
 from django.shortcuts import redirect
+from jwt_auth.models import UserInfo
 from db_schema.models import SocialConfig
 from rest_framework.response import Response
 
@@ -58,7 +59,7 @@ class InstagramMediaManager:
         # Return the authorization URL for redirecting the user
         return 200, response
 
-    def facebook_callback(self, code, social_config: SocialConfig):
+    def facebook_callback(self, code, social_config: SocialConfig,**kwargs):
         """
         Handles the Facebook OAuth callback, exchanges the authorization code for an access token, 
         and verifies permissions.
@@ -70,6 +71,7 @@ class InstagramMediaManager:
         Returns:
             Response: HTTP response with status and message.
         """
+        request = kwargs.get('request')
         if not code:
             return 400, 'No code provided'
 
@@ -111,6 +113,12 @@ class InstagramMediaManager:
             social_config.facebook_access_token = access_token
             social_config.verified = True
             social_config.save()
+            # get the user and update the user social record
+            try:
+                user_profile:UserInfo = request.user.user_info
+                user_profile.is_youtube = True
+                user_profile.save()
+            except:pass
             return Response({'msg': "顧客情報が正常に登録されました。"}, status=200)
         else:
             return Response({'msg': f"Error: {data.get('error', {}).get('message', 'Unknown error')}"}, status=400)
